@@ -1,29 +1,41 @@
 import os
 import asyncio
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQueryHandler, filters, ContextTypes
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove
+from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQueryHandler, filters, ContextTypes, ConversationHandler
 import sqlite3
 from datetime import datetime, timedelta
 import html
 import json
 import re
 
+# Состояния для ConversationHandler
+(
+    CHOOSING_ROLE,
+    READER_MENU,
+    TRANSLATOR_MENU,
+    ADDING_CHAPTER,
+    EDITING_CHAPTER,
+    EDITING_SUBSCRIPTION,
+    CHAPTER_TITLE,
+    CHAPTER_CONTENT,
+    CONFIRMING_DELETE
+) = range(9)
+
 class NovelBot:
     def __init__(self):
-        # Получаем токен из переменной окружения
         self.token = os.getenv('BOT_TOKEN')
         if not self.token:
             raise ValueError("BOT_TOKEN not found in environment variables")
             
-        self.admin_id = 244436877  # Ваш ID
-        self.channel_id = -1001464835008  # ID вашего канала
+        self.admin_id = 244436877
+        self.channel_id = -1001464835008
         
         self.application = Application.builder().token(self.token).build()
         self.setup_database()
         self.setup_handlers()
-        
+
     def setup_database(self):
-        """Инициализация базы данных"""
+        """Расширенная инициализация базы данных"""
         self.conn = sqlite3.connect('novel_bot.db')
         self.cursor = self.conn.cursor()
         
@@ -45,321 +57,417 @@ class NovelBot:
                 title TEXT,
                 content TEXT,
                 published_at TIMESTAMP,
-                message_id INTEGER
+                message_id INTEGER,
+                last_edited TIMESTAMP
+            )
+        ''')
+        
+        # Таблица каналов переводчиков
+        self.cursor.execute('''
+            CREATE TABLE IF NOT EXISTS translator_channels (
+                channel_id INTEGER PRIMARY KEY,
+                translator_id INTEGER,
+                channel_name TEXT,
+                subscription_price REAL,
+                subscription_duration INTEGER
             )
         ''')
         
         self.conn.commit()
 
     def setup_handlers(self):
-        """Настройка обработчиков команд"""
-        # Админские команды
-        self.application.add_handler(CommandHandler("add_chapter", self.add_chapter_command, filters=filters.User(self.admin_id)))
-        self.application.add_handler(CommandHandler("list_subscribers", self.list_subscribers_command, filters=filters.User(self.admin_id)))
-        self.application.add_handler(CommandHandler("add_subscriber", self.add_subscriber_command, filters=filters.User(self.admin_id)))
-        self.application.add_handler(CommandHandler("remove_subscriber", self.remove_subscriber_command, filters=filters.User(self.admin_id)))
-        
-        # Пользовательские команды
-        self.application.add_handler(CommandHandler("start", self.start_command))
-        self.application.add_handler(CommandHandler("subscribe", self.subscribe_command))
-        self.application.add_handler(CommandHandler("status", self.status_command))
-        
-        # Обработчик текстовых сообщений (для получения глав от админа)
-        self.application.add_handler(MessageHandler(
-            filters.TEXT & filters.User(self.admin_id) & filters.ChatType.PRIVATE,
-            self.handle_admin_message
-        ))
-
-    def generate_hidden_mark(self, user_id: int) -> str:
-        """Генерация скрытой метки для подписчика"""
-        # Используем Zero-Width символы для создания скрытой метки
-        marks = {
-            '0': '​',  # Zero-Width Space
-            '1': '‌',  # Zero-Width Non-Joiner
-            '2': '‍',  # Zero-Width Joiner
-            '3': '﻿',  # Zero-Width No-Break Space
-        }
-        
-        # Конвертируем user_id в строку и кодируем её
-        binary = format(user_id, '012b')  # 12 бит для хранения ID
-        return ''.join(marks[str(int(b) % 4)] for b in binary)
-
-    def decode_hidden_mark(self, text: str) -> int:
-        """Декодирование скрытой метки для определения подписчика"""
-        marks = {
-            '​': '0',  # Zero-Width Space
-            '‌': '1',  # Zero-Width Non-Joiner
-            '‍': '2',  # Zero-Width Joiner
-            '﻿': '3',  # Zero-Width No-Break Space
-        }
-        
-        # Ищем все скрытые метки в тексте
-        binary = ''
-        for char in text:
-            if char in marks:
-                binary += marks[char]
-        
-        if len(binary) >= 12:
-            return int(binary[:12], 2)
-        return None
-
-    def protect_text(self, text: str, user_id: int) -> str:
-        """Защита текста от копирования"""
-        # Добавляем скрытую метку в начало каждого абзаца
-        hidden_mark = self.generate_hidden_mark(user_id)
-        paragraphs = text.split('\n\n')
-        protected_paragraphs = [hidden_mark + p for p in paragraphs]
-        
-        # Добавляем HTML-обёртку для запрета выделения
-        protected_text = """
-<div style="user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none;">
-{}
-</div>
-""".format('\n\n'.join(protected_paragraphs))
-        
-        return protected_text
-
-    async def add_chapter_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Команда для добавления новой главы"""
-        await update.message.reply_text(
-            "Отправьте главу в формате:\n\n"
-            "Заголовок\n"
-            "---\n"
-            "Текст главы"
+        """Настройка обработчиков команд с новым интерфейсом"""
+        conv_handler = ConversationHandler(
+            entry_points=[CommandHandler('start', self.start_command)],
+            states={
+                CHOOSING_ROLE: [
+                    CallbackQueryHandler(self.translator_menu, pattern='^translator$'),
+                    CallbackQueryHandler(self.reader_menu, pattern='^reader$')
+                ],
+                TRANSLATOR_MENU: [
+                    CallbackQueryHandler(self.add_chapter_start, pattern='^add_chapter$'),
+                    CallbackQueryHandler(self.edit_subscription, pattern='^edit_subscription$'),
+                    CallbackQueryHandler(self.list_subscribers_menu, pattern='^list_subscribers$'),
+                    CallbackQueryHandler(self.list_chapters, pattern='^list_chapters$'),
+                    CallbackQueryHandler(self.start_command, pattern='^back_to_start$')
+                ],
+                READER_MENU: [
+                    CallbackQueryHandler(self.show_subscriptions, pattern='^show_subscriptions$'),
+                    CallbackQueryHandler(self.show_new_chapters, pattern='^show_new_chapters$'),
+                    CallbackQueryHandler(self.start_command, pattern='^back_to_start$')
+                ],
+                ADDING_CHAPTER: [
+                    MessageHandler(filters.TEXT & ~filters.COMMAND, self.handle_chapter_title),
+                    CallbackQueryHandler(self.translator_menu, pattern='^cancel$')
+                ],
+                CHAPTER_CONTENT: [
+                    MessageHandler(filters.TEXT & ~filters.COMMAND, self.handle_chapter_content),
+                    CallbackQueryHandler(self.translator_menu, pattern='^cancel$')
+                ],
+                EDITING_CHAPTER: [
+                    CallbackQueryHandler(self.edit_chapter_content, pattern='^edit_chapter_\d+$'),
+                    CallbackQueryHandler(self.confirm_delete_chapter, pattern='^delete_chapter_\d+$'),
+                    CallbackQueryHandler(self.translator_menu, pattern='^back_to_menu$')
+                ],
+                CONFIRMING_DELETE: [
+                    CallbackQueryHandler(self.delete_chapter, pattern='^confirm_delete_\d+$'),
+                    CallbackQueryHandler(self.list_chapters, pattern='^cancel_delete$')
+                ]
+            },
+            fallbacks=[CommandHandler('cancel', self.cancel)]
         )
 
-    async def handle_admin_message(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Обработка новой главы от админа"""
-        try:
-            # Разделяем заголовок и содержимое
-            parts = update.message.text.split('\n---\n', 1)
-            if len(parts) != 2:
-                await update.message.reply_text("Неверный формат. Используйте разделитель '---'")
-                return
-                
-            title, content = parts
-            title = title.strip()
-            content = content.strip()
-            
-            # Сохраняем главу в базу
-            self.cursor.execute("""
-                INSERT INTO chapters (title, content, published_at)
-                VALUES (?, ?, ?)
-            """, (title, content, datetime.now()))
-            self.conn.commit()
-            chapter_id = self.cursor.lastrowid
-            
-            # Получаем список активных подписчиков
-            self.cursor.execute("""
-                SELECT user_id FROM subscribers 
-                WHERE subscription_end >= date('now')
-            """)
-            subscribers = self.cursor.fetchall()
-            
-            # Публикуем главу в канал для каждого подписчика
-            for (user_id,) in subscribers:
-                protected_content = self.protect_text(content, user_id)
-                message = f"<b>{html.escape(title)}</b>\n\n{protected_content}"
-                try:
-                    # Отправляем в канал с HTML-форматированием
-                    sent_msg = await context.bot.send_message(
-                        chat_id=self.channel_id,
-                        text=message,
-                        parse_mode='HTML'
-                    )
-                    # Ограничиваем доступ только для конкретного подписчика
-                    await context.bot.restrict_chat_member(
-                        chat_id=self.channel_id,
-                        user_id=user_id,
-                        permissions={
-                            'can_send_messages': False,
-                            'can_send_media_messages': False,
-                            'can_send_other_messages': False,
-                            'can_add_web_page_previews': False
-                        }
-                    )
-                except Exception as e:
-                    await update.message.reply_text(f"Ошибка при отправке главы подписчику {user_id}: {str(e)}")
-            
-            await update.message.reply_text(f"Глава '{title}' успешно опубликована!")
-            
-        except Exception as e:
-            await update.message.reply_text(f"Ошибка при публикации главы: {str(e)}")
+        self.application.add_handler(conv_handler)
 
-    async def add_subscriber_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Команда для добавления подписчика (только для админа)"""
-        args = context.args
-        if len(args) < 1:
-            await update.message.reply_text(
-                "Использование:\n"
-                "/add_subscriber <ID или @username> [дни_подписки]\n"
-                "Примеры:\n"
-                "/add_subscriber 123456789 30\n"
-                "/add_subscriber @username 30"
-            )
-            return
+    async def start_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Начальное меню с выбором роли"""
+        keyboard = [
+            [InlineKeyboardButton("🖋 Кабинет переводчика", callback_data='translator')],
+            [InlineKeyboardButton("📚 Кабинет читателя", callback_data='reader')]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        text = "👋 Добро пожаловать!\n\nВыберите режим работы:"
+        
+        if update.callback_query:
+            await update.callback_query.message.edit_text(text, reply_markup=reply_markup)
+        else:
+            await update.message.reply_text(text, reply_markup=reply_markup)
+        
+        return CHOOSING_ROLE
 
-        try:
-            subscriber_id = args[0]
-            days = int(args[1]) if len(args) > 1 else 30  # По умолчанию 30 дней
-            
-            # Определяем, передан ли username или ID
-            if subscriber_id.startswith('@'):
-                # Получаем информацию о пользователе по username
-                try:
-                    chat = await context.bot.get_chat(subscriber_id)
-                    user_id = chat.id
-                    username = chat.username
-                except Exception as e:
-                    await update.message.reply_text(f"Не удалось найти пользователя {subscriber_id}")
-                    return
-            else:
-                try:
-                    user_id = int(subscriber_id)
-                    try:
-                        chat = await context.bot.get_chat(user_id)
-                        username = chat.username
-                    except:
-                        username = None
-                except ValueError:
-                    await update.message.reply_text("ID пользователя должен быть числом или начинаться с @")
-                    return
+    async def translator_menu(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Меню переводчика"""
+        query = update.callback_query
+        await query.answer()
+        
+        # Проверяем, является ли пользователь админом
+        if query.from_user.id != self.admin_id:
+            await query.message.edit_text("⛔️ У вас нет доступа к кабинету переводчика")
+            return ConversationHandler.END
+        
+        keyboard = [
+            [InlineKeyboardButton("📝 Добавить главу", callback_data='add_chapter')],
+            [InlineKeyboardButton("⚙️ Изменить условия подписки", callback_data='edit_subscription')],
+            [InlineKeyboardButton("👥 Список подписчиков", callback_data='list_subscribers')],
+            [InlineKeyboardButton("📚 Список глав", callback_data='list_chapters')],
+            [InlineKeyboardButton("↩️ Назад", callback_data='back_to_start')]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        await query.message.edit_text("🖋 Кабинет переводчика", reply_markup=reply_markup)
+        return TRANSLATOR_MENU
 
-            # Добавляем или обновляем подписчика
-            subscription_end = (datetime.now() + timedelta(days=days)).date()
-            self.cursor.execute("""
-                INSERT OR REPLACE INTO subscribers 
-                (user_id, username, subscription_end, created_at) 
-                VALUES (?, ?, ?, ?)
-            """, (user_id, username, subscription_end, datetime.now()))
-            self.conn.commit()
+    async def reader_menu(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Меню читателя"""
+        query = update.callback_query
+        await query.answer()
+        
+        keyboard = [
+            [InlineKeyboardButton("📚 Мои подписки", callback_data='show_subscriptions')],
+            [InlineKeyboardButton("🆕 Новые главы", callback_data='show_new_chapters')],
+            [InlineKeyboardButton("↩️ Назад", callback_data='back_to_start')]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        await query.message.edit_text("📚 Кабинет читателя", reply_markup=reply_markup)
+        return READER_MENU
 
-            # Генерируем ссылку-приглашение
-            try:
-                invite_link = await context.bot.create_chat_invite_link(
-                    chat_id=self.channel_id,
-                    member_limit=1,
-                    expire_date=datetime.now() + timedelta(days=1)
-                )
-                
-                # Формируем сообщение об успешном добавлении
-                success_message = f"Подписчик {subscriber_id} добавлен до {subscription_end}\n"
-                if username:
-                    success_message += f"Username: @{username}\n"
-                success_message += f"ID: {user_id}\n"
-                success_message += f"Ссылка для входа в канал: {invite_link.invite_link}"
-                
-                await update.message.reply_text(success_message)
-                
-                # Отправляем уведомление пользователю
-                try:
-                    user_message = (
-                        "🎉 Поздравляем! Вам предоставлен доступ к каналу.\n"
-                        f"Ваша подписка действует до: {subscription_end}\n\n"
-                        f"Для входа используйте ссылку: {invite_link.invite_link}"
-                    )
-                    await context.bot.send_message(
-                        chat_id=user_id,
-                        text=user_message
-                    )
-                except Exception as e:
-                    await update.message.reply_text(f"Предупреждение: не удалось отправить уведомление пользователю: {str(e)}")
+    async def add_chapter_start(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Начало процесса добавления главы"""
+        query = update.callback_query
+        await query.answer()
+        
+        keyboard = [[InlineKeyboardButton("❌ Отмена", callback_data='cancel')]]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        await query.message.edit_text(
+            "📝 Добавление новой главы\n\n"
+            "Отправьте заголовок главы:",
+            reply_markup=reply_markup
+        )
+        return ADDING_CHAPTER
 
-            except Exception as e:
-                await update.message.reply_text(f"Подписчик добавлен, но возникла ошибка при создании ссылки: {str(e)}")
-
-        except Exception as e:
-            await update.message.reply_text(f"Ошибка при добавлении подписчика: {str(e)}")
-
-    async def remove_subscriber_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Команда для удаления подписчика (только для админа)"""
-        args = context.args
-        if len(args) < 1:
-            await update.message.reply_text(
-                "Использование: /remove_subscriber <user_id>"
-            )
-            return
-
-        try:
-            user_id = int(args[0])
-            
-            # Удаляем подписчика из базы
-            self.cursor.execute("DELETE FROM subscribers WHERE user_id = ?", (user_id,))
-            self.conn.commit()
-            
-            # Удаляем из канала
-            try:
-                await context.bot.ban_chat_member(
-                    chat_id=self.channel_id,
-                    user_id=user_id
-                )
-                await context.bot.unban_chat_member(
-                    chat_id=self.channel_id,
-                    user_id=user_id
-                )
-            except Exception as e:
-                await update.message.reply_text(f"Ошибка при удалении из канала: {str(e)}")
-
-            await update.message.reply_text(f"Подписчик {user_id} удален")
-
-        except Exception as e:
-            await update.message.reply_text(f"Ошибка: {str(e)}")
-
-    async def subscribe_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Команда для оформления подписки"""
-        keyboard = [[InlineKeyboardButton("Оплатить подписку", url="https://t.me/your_payment_bot")]]
+    async def handle_chapter_title(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Обработка заголовка главы"""
+        context.user_data['chapter_title'] = update.message.text
+        
+        keyboard = [[InlineKeyboardButton("❌ Отмена", callback_data='cancel')]]
         reply_markup = InlineKeyboardMarkup(keyboard)
         
         await update.message.reply_text(
-            "Стоимость подписки: XXX руб/мес\n"
-            "После оплаты отправьте скриншот администратору: @your_username",
+            "📄 Теперь отправьте текст главы:",
             reply_markup=reply_markup
         )
+        return CHAPTER_CONTENT
 
-    async def start_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Команда /start"""
-        welcome_text = """
-Добро пожаловать! 
-
-Здесь вы можете подписаться на ранний доступ к главам новеллы.
-
-Команды:
-/subscribe - Оформить подписку
-/status - Проверить статус подписки
-"""
-        await update.message.reply_text(welcome_text)
-
-    async def status_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Проверка статуса подписки"""
-        user_id = update.effective_user.id
-        self.cursor.execute(
-            "SELECT subscription_end FROM subscribers WHERE user_id = ?",
-            (user_id,)
-        )
-        result = self.cursor.fetchone()
+    async def handle_chapter_content(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Обработка содержимого главы"""
+        title = context.user_data['chapter_title']
+        content = update.message.text
         
-        if result:
-            end_date = datetime.strptime(result[0], '%Y-%m-%d').date()
-            days_left = (end_date - datetime.now().date()).days
+        try:
+            # Сохраняем главу в базу
+            self.cursor.execute("""
+                INSERT INTO chapters (title, content, published_at, last_edited)
+                VALUES (?, ?, ?, ?)
+            """, (title, content, datetime.now(), datetime.now()))
+            self.conn.commit()
             
-            if days_left > 0:
-                await update.message.reply_text(
-                    f"Ваша подписка активна\n"
-                    f"Дней до окончания: {days_left}"
-                )
-            else:
-                await update.message.reply_text(
-                    "Ваша подписка истекла\n"
-                    "Используйте /subscribe для продления"
-                )
-        else:
+            await self.publish_chapter_to_channel(update, context, title, content)
+            
+            keyboard = [
+                [InlineKeyboardButton("📚 К списку глав", callback_data='list_chapters')],
+                [InlineKeyboardButton("🏠 В главное меню", callback_data='back_to_menu')]
+            ]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            
             await update.message.reply_text(
-                "У вас нет активной подписки\n"
-                "Используйте /subscribe для оформления"
+                "✅ Глава успешно добавлена и опубликована!",
+                reply_markup=reply_markup
             )
+        except Exception as e:
+            await update.message.reply_text(f"❌ Ошибка при сохранении главы: {str(e)}")
+        
+        return TRANSLATOR_MENU
 
-    async def list_subscribers_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Список активных подписчиков (только для админа)"""
+    async def list_chapters(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Список всех глав с возможностью редактирования"""
+        query = update.callback_query
+        if query:
+            await query.answer()
+        
+        self.cursor.execute("""
+            SELECT id, title, published_at, last_edited 
+            FROM chapters 
+            ORDER BY published_at DESC
+        """)
+        chapters = self.cursor.fetchall()
+        
+        if not chapters:
+            keyboard = [[InlineKeyboardButton("↩️ Назад", callback_data='back_to_menu')]]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            text = "📚 Список глав пуст"
+            
+            if query:
+                await query.message.edit_text(text, reply_markup=reply_markup)
+            else:
+                await update.message.reply_text(text, reply_markup=reply_markup)
+            return TRANSLATOR_MENU
+        
+        keyboard = []
+        for chapter_id, title, published_at, last_edited in chapters:
+            pub_date = datetime.strptime(published_at, '%Y-%m-%d %H:%M:%S').strftime('%d.%m.%Y')
+            keyboard.extend([
+                [InlineKeyboardButton(f"📖 {title}", callback_data=f'view_chapter_{chapter_id}')],
+                [
+                    InlineKeyboardButton("✏️ Редактировать", callback_data=f'edit_chapter_{chapter_id}'),
+                    InlineKeyboardButton("🗑 Удалить", callback_data=f'delete_chapter_{chapter_id}')
+                ]
+            ])
+        
+        keyboard.append([InlineKeyboardButton("↩️ Назад", callback_data='back_to_menu')])
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        text = "📚 Список опубликованных глав:"
+        
+        if query:
+            await query.message.edit_text(text, reply_markup=reply_markup)
+        else:
+            await update.message.reply_text(text, reply_markup=reply_markup)
+        
+        return EDITING_CHAPTER
+
+    async def edit_chapter_content(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Редактирование содержимого главы"""
+        query = update.callback_query
+        await query.answer()
+        
+        chapter_id = int(query.data.split('_')[2])
+        context.user_data['editing_chapter_id'] = chapter_id
+        
+        self.cursor.execute("SELECT title, content FROM chapters WHERE id = ?", (chapter_id,))
+        title, content = self.cursor.fetchone()
+        
+        keyboard = [[InlineKeyboardButton("❌ Отмена", callback_data='cancel')]]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        await query.message.edit_text(
+            f"✏️ Редактирование главы: {title}\n\n"
+            "Отправьте новый текст главы:",
+            reply_markup=reply_markup
+        )
+        return CHAPTER_CONTENT
+
+    async def confirm_delete_chapter(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Подтверждение удаления главы"""
+        query = update.callback_query
+        await query.answer()
+        
+        chapter_id = int(query.data.split('_')[2])
+        context.user_data['deleting_chapter_id'] = chapter_id
+        
+        self.cursor.execute("SELECT title FROM chapters WHERE id = ?", (chapter_id,))
+        title = self.cursor.fetchone()[0]
+        
+        keyboard = [
+            [
+                InlineKeyboardButton("✅ Да, удалить", callback_data=f'confirm_delete_{chapter_id}'),
+                InlineKeyboardButton("❌ Нет, отмена", callback_data='cancel_delete')
+            ]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        await query.message.edit_text(
+            f"🗑 Удалить главу '{title}'?\n\n"
+            "⚠️ Это действие нельзя отменить!",
+            reply_markup=reply_markup
+        )
+        return CONFIRMING_DELETE
+
+    async def delete_chapter(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Удаление главы"""
+        query = update.callback_query
+        await query.answer()
+        
+        chapter_id = int(query.data.split('_')[2])
+        
+        try:
+            self.cursor.execute("DELETE FROM chapters WHERE id = ?", (chapter_id,))
+            self.conn.commit()
+            
+            await query.message.edit_text("✅ Глава успешно удалена!")
+            await asyncio.sleep(2)
+            return await self.list_chapters(update, context)
+            
+        except Exception as e:
+            await query.message.edit_text(f"❌ Ошибка при удалении главы: {str(e)}")
+            return TRANSLATOR_MENU
+
+    async def show_subscriptions(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Показ активных подписок пользователя"""
+        query = update.callback_query
+        await query.answer()
+        
+        user_id = query.from_user.id
+        
+        # Получаем активные подписки пользователя
+        self.cursor.execute("""
+            SELECT subscription_end 
+            FROM subscribers 
+            WHERE user_id = ? AND subscription_end >= date('now')
+        """, (user_id,))
+        subscription = self.cursor.fetchone()
+        
+        keyboard = [[InlineKeyboardButton("↩️ Назад", callback_data='back_to_start')]]
+        if subscription:
+            end_date = datetime.strptime(subscription[0], '%Y-%m-%d').date()
+            days_left = (end_date - datetime.now().date()).days
+            text = (
+                "📚 Ваша подписка:\n\n"
+                f"Статус: ✅ Активна\n"
+                f"Дней до окончания: {days_left}\n"
+                f"Дата окончания: {end_date.strftime('%d.%m.%Y')}"
+            )
+        else:
+            keyboard.insert(0, [InlineKeyboardButton("💫 Оформить подписку", callback_data='subscribe')])
+            text = "📚 У вас нет активных подписок"
+
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await query.message.edit_text(text, reply_markup=reply_markup)
+        return READER_MENU
+
+    async def show_new_chapters(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Показ новых глав"""
+        query = update.callback_query
+        await query.answer()
+        
+        user_id = query.from_user.id
+        
+        # Проверяем, есть ли активная подписка
+        self.cursor.execute("""
+            SELECT subscription_end 
+            FROM subscribers 
+            WHERE user_id = ? AND subscription_end >= date('now')
+        """, (user_id,))
+        subscription = self.cursor.fetchone()
+        
+        if not subscription:
+            keyboard = [
+                [InlineKeyboardButton("💫 Оформить подписку", callback_data='subscribe')],
+                [InlineKeyboardButton("↩️ Назад", callback_data='back_to_start')]
+            ]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            await query.message.edit_text(
+                "⚠️ У вас нет активной подписки для просмотра новых глав",
+                reply_markup=reply_markup
+            )
+            return READER_MENU
+        
+        # Получаем последние главы
+        self.cursor.execute("""
+            SELECT id, title, published_at 
+            FROM chapters 
+            ORDER BY published_at DESC 
+            LIMIT 10
+        """)
+        chapters = self.cursor.fetchall()
+        
+        if not chapters:
+            keyboard = [[InlineKeyboardButton("↩️ Назад", callback_data='back_to_start')]]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            await query.message.edit_text(
+                "📚 Новых глав пока нет",
+                reply_markup=reply_markup
+            )
+            return READER_MENU
+        
+        text = "📚 Последние главы:\n\n"
+        keyboard = []
+        
+        for chapter_id, title, published_at in chapters:
+            pub_date = datetime.strptime(published_at, '%Y-%m-%d %H:%M:%S').strftime('%d.%m.%Y')
+            text += f"📖 {title}\n📅 {pub_date}\n\n"
+            keyboard.append([InlineKeyboardButton(f"Читать: {title}", callback_data=f'read_chapter_{chapter_id}')])
+        
+        keyboard.append([InlineKeyboardButton("↩️ Назад", callback_data='back_to_start')])
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        await query.message.edit_text(text, reply_markup=reply_markup)
+        return READER_MENU
+
+    async def edit_subscription(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Изменение условий подписки"""
+        query = update.callback_query
+        await query.answer()
+        
+        if query.from_user.id != self.admin_id:
+            await query.message.edit_text("⛔️ У вас нет доступа к этой функции")
+            return TRANSLATOR_MENU
+        
+        keyboard = [
+            [InlineKeyboardButton("💰 Изменить стоимость", callback_data='change_price')],
+            [InlineKeyboardButton("⏱ Изменить длительность", callback_data='change_duration')],
+            [InlineKeyboardButton("↩️ Назад", callback_data='back_to_menu')]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        await query.message.edit_text(
+            "⚙️ Настройки подписки\n\n"
+            "Выберите параметр для изменения:",
+            reply_markup=reply_markup
+        )
+        return TRANSLATOR_MENU
+
+    async def list_subscribers_menu(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Показ списка подписчиков"""
+        query = update.callback_query
+        await query.answer()
+        
+        if query.from_user.id != self.admin_id:
+            await query.message.edit_text("⛔️ У вас нет доступа к этой функции")
+            return TRANSLATOR_MENU
+        
         self.cursor.execute("""
             SELECT user_id, username, subscription_end 
             FROM subscribers 
@@ -368,20 +476,51 @@ class NovelBot:
         """)
         subscribers = self.cursor.fetchall()
         
-        if subscribers:
-            message = "Активные подписчики:\n\n"
-            for user_id, username, end_date in subscribers:
-                message += f"ID: {user_id}\n"
-                message += f"Username: @{username}\n"
-                message += f"Подписка до: {end_date}\n\n"
+        if not subscribers:
+            keyboard = [[InlineKeyboardButton("↩️ Назад", callback_data='back_to_menu')]]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            await query.message.edit_text(
+                "👥 Активных подписчиков нет",
+                reply_markup=reply_markup
+            )
+            return TRANSLATOR_MENU
+        
+        text = "👥 Список активных подписчиков:\n\n"
+        for user_id, username, end_date in subscribers:
+            end_date_obj = datetime.strptime(end_date, '%Y-%m-%d').date()
+            days_left = (end_date_obj - datetime.now().date()).days
+            text += (
+                f"ID: {user_id}\n"
+                f"Username: {('@' + username) if username else 'не указан'}\n"
+                f"Подписка до: {end_date_obj.strftime('%d.%m.%Y')}\n"
+                f"Осталось дней: {days_left}\n\n"
+            )
+        
+        keyboard = [[InlineKeyboardButton("↩️ Назад", callback_data='back_to_menu')]]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        # Разбиваем длинное сообщение, если нужно
+        if len(text) > 4096:
+            parts = [text[i:i+4096] for i in range(0, len(text), 4096)]
+            for part in parts[:-1]:
+                await query.message.reply_text(part)
+            await query.message.reply_text(parts[-1], reply_markup=reply_markup)
         else:
-            message = "Активных подписчиков нет"
-            
-        await update.message.reply_text(message)
+            await query.message.edit_text(text, reply_markup=reply_markup)
+        
+        return TRANSLATOR_MENU
+
+    async def cancel(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Отмена текущего действия"""
+        if update.callback_query:
+            await update.callback_query.message.edit_text("❌ Действие отменено")
+        else:
+            await update.message.reply_text("❌ Действие отменено")
+        return ConversationHandler.END
 
     def run(self):
         """Запуск бота"""
-        print("Bot starting...")
+        print("🚀 Бот запущен...")
         self.application.run_polling()
 
 if __name__ == "__main__":
