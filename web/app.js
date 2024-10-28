@@ -4,6 +4,9 @@ let tg = window.Telegram.WebApp;
 tg.expand();
 tg.ready();
 
+// Обработка темы Telegram
+document.documentElement.className = tg.colorScheme;
+
 let currentMode = 'reader';
 
 function switchMode(mode) {
@@ -19,6 +22,7 @@ function updateContent() {
             <h2>Читалка</h2>
             <div class="novels-list">
                 <!-- Здесь будет список новелл -->
+                <p>Режим читателя</p>
             </div>
         `;
     } else {
@@ -26,6 +30,7 @@ function updateContent() {
             <h2>Кабинет переводчика</h2>
             <div class="translator-tools">
                 <!-- Здесь будут инструменты переводчика -->
+                <p>Режим переводчика</p>
             </div>
         `;
     }
