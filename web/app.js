@@ -26,24 +26,89 @@ function updateContent() {
     
     if (currentMode === 'reader') {
         content.innerHTML = `
-            <div class="tg-card">
-                <h3>Популярные новеллы</h3>
-                <p>Здесь будет список популярных новелл</p>
-            </div>
-            <div class="tg-card">
-                <h3>Продолжить чтение</h3>
-                <p>Здесь будут новеллы, которые вы читаете</p>
+            <div class="tg-section">
+                <div class="tg-card">
+                    <div class="tg-card-header">
+                        <h3>Мои подписки</h3>
+                    </div>
+                    <div class="tg-card-content">
+                        <div class="novel-item">
+                            <div class="novel-info">
+                                <h4>Возрождение после смерти</h4>
+                                <p>Последняя глава: 156</p>
+                            </div>
+                            <button class="tg-button">Читать</button>
+                        </div>
+                        <div class="novel-item">
+                            <div class="novel-info">
+                                <h4>Монарх упадка</h4>
+                                <p>Последняя глава: 89</p>
+                            </div>
+                            <button class="tg-button">Читать</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tg-card">
+                    <div class="tg-card-header">
+                        <h3>Новые главы</h3>
+                    </div>
+                    <div class="tg-card-content">
+                        <div class="chapter-item">
+                            <div class="chapter-info">
+                                <h4>Глава 156: Начало конца</h4>
+                                <p>Возрождение после смерти</p>
+                            </div>
+                            <span class="chapter-date">Сегодня</span>
+                        </div>
+                        <div class="chapter-item">
+                            <div class="chapter-info">
+                                <h4>Глава 89: Последний бой</h4>
+                                <p>Монарх упадка</p>
+                            </div>
+                            <span class="chapter-date">Вчера</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         `;
     } else {
         content.innerHTML = `
-            <div class="tg-card">
-                <h3>Мои переводы</h3>
-                <p>Здесь будет список ваших переводов</p>
-            </div>
-            <div class="tg-card">
-                <h3>Статистика</h3>
-                <p>Здесь будет статистика ваших переводов</p>
+            <div class="tg-section">
+                <div class="tg-card">
+                    <div class="tg-card-header">
+                        <h3>Мои переводы</h3>
+                    </div>
+                    <div class="tg-card-content">
+                        <div class="novel-item">
+                            <div class="novel-info">
+                                <h4>Возрождение после смерти</h4>
+                                <p>Активных читателей: 1.2K</p>
+                            </div>
+                            <button class="tg-button">Редактировать</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tg-card">
+                    <div class="tg-card-header">
+                        <h3>Статистика</h3>
+                    </div>
+                    <div class="tg-card-content">
+                        <div class="chapter-item">
+                            <div class="chapter-info">
+                                <h4>Всего подписчиков</h4>
+                                <p>1,543</p>
+                            </div>
+                        </div>
+                        <div class="chapter-item">
+                            <div class="chapter-info">
+                                <h4>Глав переведено</h4>
+                                <p>156</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         `;
     }
@@ -51,3 +116,14 @@ function updateContent() {
 
 // Инициализация начального контента
 updateContent();
+
+// Обработка ошибок
+window.addEventListener('error', function(e) {
+    console.error('Error:', e.error);
+    const content = document.getElementById('content');
+    content.innerHTML = `
+        <div class="error">
+            Произошла ошибка. Пожалуйста, попробуйте позже.
+        </div>
+    `;
+});
