@@ -1,36 +1,49 @@
 let tg = window.Telegram.WebApp;
-
-// Инициализация приложения
 tg.expand();
 tg.ready();
 
-// Обработка темы Telegram
+// Применяем тему Telegram
 document.documentElement.className = tg.colorScheme;
 
+// Обработка переключения табов
+const tabs = document.querySelectorAll('.tg-tab');
 let currentMode = 'reader';
 
-function switchMode(mode) {
-    currentMode = mode;
-    updateContent();
-}
+tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+        // Убираем активный класс у всех табов
+        tabs.forEach(t => t.classList.remove('active'));
+        // Добавляем активный класс выбранному табу
+        tab.classList.add('active');
+        // Обновляем контент
+        currentMode = tab.dataset.mode;
+        updateContent();
+    });
+});
 
 function updateContent() {
     const content = document.getElementById('content');
     
     if (currentMode === 'reader') {
         content.innerHTML = `
-            <h2>Читалка</h2>
-            <div class="novels-list">
-                <!-- Здесь будет список новелл -->
-                <p>Режим читателя</p>
+            <div class="tg-card">
+                <h3>Популярные новеллы</h3>
+                <p>Здесь будет список популярных новелл</p>
+            </div>
+            <div class="tg-card">
+                <h3>Продолжить чтение</h3>
+                <p>Здесь будут новеллы, которые вы читаете</p>
             </div>
         `;
     } else {
         content.innerHTML = `
-            <h2>Кабинет переводчика</h2>
-            <div class="translator-tools">
-                <!-- Здесь будут инструменты переводчика -->
-                <p>Режим переводчика</p>
+            <div class="tg-card">
+                <h3>Мои переводы</h3>
+                <p>Здесь будет список ваших переводов</p>
+            </div>
+            <div class="tg-card">
+                <h3>Статистика</h3>
+                <p>Здесь будет статистика ваших переводов</p>
             </div>
         `;
     }
