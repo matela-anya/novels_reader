@@ -191,38 +191,85 @@ class NovelBot:
         args = context.args
         if len(args) < 1:
             await update.message.reply_text(
-                "Использование: /add_subscriber <user_id> [дни_подписки]\n"
-                "Пример: /add_subscriber 123456789 30"
+                "Использование:\n"
+                "/add_subscriber <ID или @username> [дни_подписки]\n"
+                "Примеры:\n"
+                "/add_subscriber 123456789 30\n"
+                "/add_subscriber @username 30"
             )
             return
 
         try:
-            user_id = int(args[0])
+            subscriber_id = args[0]
             days = int(args[1]) if len(args) > 1 else 30  # По умолчанию 30 дней
+            
+            # Определяем, передан ли username или ID
+            if subscriber_id.startswith('@'):
+                # Получаем информацию о пользователе по username
+                try:
+                    chat = await context.bot.get_chat(subscriber_id)
+                    user_id = chat.id
+                    username = chat.username
+                except Exception as e:
+                    await update.message.reply_text(f"Не удалось найти пользователя {subscriber_id}")
+                    return
+            else:
+                try:
+                    user_id = int(subscriber_id)
+                    try:
+                        chat = await context.bot.get_chat(user_id)
+                        username = chat.username
+                    except:
+                        username = None
+                except ValueError:
+                    await update.message.reply_text("ID пользователя должен быть числом или начинаться с @")
+                    return
 
             # Добавляем или обновляем подписчика
             subscription_end = (datetime.now() + timedelta(days=days)).date()
             self.cursor.execute("""
                 INSERT OR REPLACE INTO subscribers 
-                (user_id, subscription_end, created_at) 
-                VALUES (?, ?, ?)
-            """, (user_id, subscription_end, datetime.now()))
+                (user_id, username, subscription_end, created_at) 
+                VALUES (?, ?, ?, ?)
+            """, (user_id, username, subscription_end, datetime.now()))
             self.conn.commit()
 
             # Генерируем ссылку-приглашение
-            invite_link = await context.bot.create_chat_invite_link(
-                chat_id=self.channel_id,
-                member_limit=1,
-                expire_date=datetime.now() + timedelta(days=1)
-            )
+            try:
+                invite_link = await context.bot.create_chat_invite_link(
+                    chat_id=self.channel_id,
+                    member_limit=1,
+                    expire_date=datetime.now() + timedelta(days=1)
+                )
+                
+                # Формируем сообщение об успешном добавлении
+                success_message = f"Подписчик {subscriber_id} добавлен до {subscription_end}\n"
+                if username:
+                    success_message += f"Username: @{username}\n"
+                success_message += f"ID: {user_id}\n"
+                success_message += f"Ссылка для входа в канал: {invite_link.invite_link}"
+                
+                await update.message.reply_text(success_message)
+                
+                # Отправляем уведомление пользователю
+                try:
+                    user_message = (
+                        "🎉 Поздравляем! Вам предоставлен доступ к каналу.\n"
+                        f"Ваша подписка действует до: {subscription_end}\n\n"
+                        f"Для входа используйте ссылку: {invite_link.invite_link}"
+                    )
+                    await context.bot.send_message(
+                        chat_id=user_id,
+                        text=user_message
+                    )
+                except Exception as e:
+                    await update.message.reply_text(f"Предупреждение: не удалось отправить уведомление пользователю: {str(e)}")
 
-            await update.message.reply_text(
-                f"Подписчик {user_id} добавлен до {subscription_end}\n"
-                f"Ссылка для входа в канал: {invite_link.invite_link}"
-            )
+            except Exception as e:
+                await update.message.reply_text(f"Подписчик добавлен, но возникла ошибка при создании ссылки: {str(e)}")
 
         except Exception as e:
-            await update.message.reply_text(f"Ошибка: {str(e)}")
+            await update.message.reply_text(f"Ошибка при добавлении подписчика: {str(e)}")
 
     async def remove_subscriber_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Команда для удаления подписчика (только для админа)"""
