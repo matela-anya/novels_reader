@@ -5,25 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="format-detection" content="telephone=no">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="MobileOptimized" content="176">
-    <meta name="HandheldFriendly" content="True">
-    <meta name="robots" content="noindex, nofollow">
     <title>Novels Reader</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="app">
-        <div class="container">
+        <header class="tg-header">
             <h1>Novels Reader</h1>
-            <div class="mode-switcher">
-                <button onclick="switchMode('reader')">Читатель</button>
-                <button onclick="switchMode('translator')">Переводчик</button>
+        </header>
+        
+        <main class="tg-main">
+            <div class="tg-tabs">
+                <button class="tg-tab active" data-mode="reader">Читатель</button>
+                <button class="tg-tab" data-mode="translator">Переводчик</button>
             </div>
-            <div id="content">
-                <!-- Здесь будет основной контент -->
+
+            <div id="content" class="tg-content">
+                <!-- Контент будет добавляться через JavaScript -->
             </div>
-        </div>
+        </main>
     </div>
     <script src="app.js"></script>
 </body>
