@@ -1,12 +1,19 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "cd webapp",
-  "outputDirectory": "webapp",
   "framework": "static",
-  "rewrites": [
+  "outputDirectory": "webapp",
+  "routes": [
+    { 
+      "src": "/js/(.*)",
+      "dest": "/webapp/js/$1"
+    },
+    { 
+      "src": "/css/(.*)",
+      "dest": "/webapp/css/$1"
+    },
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "src": "/(.*)",
+      "dest": "/webapp/$1"
     }
   ]
 }
