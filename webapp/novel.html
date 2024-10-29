@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Возрождение после смерти | Novels Reader</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="novel.css">
+</head>
+<body>
+    <div class="app-container novel-page">
+        <!-- Шапка с обложкой -->
+        <div class="novel-header">
+            <div class="novel-cover">
+                <img src="/api/placeholder/400/600" alt="Обложка новеллы">
+            </div>
+            <div class="novel-header-content">
+                <div class="novel-main-info">
+                    <h1 class="novel-title">Возрождение после смерти</h1>
+                    <div class="novel-stats">
+                        <span class="stat">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                            </svg>
+                            12.5K
+                        </span>
+                        <span class="stat">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                <circle cx="12" cy="12" r="3"/>
+                            </svg>
+                            156K
+                        </span>
+                    </div>
+                </div>
+                <div class="novel-actions">
+                    <button class="action-button primary unsubscribe">Отписаться</button>
+                    <button class="action-button secondary bookmark active">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Основная информация -->
+        <div class="novel-content">
+            <!-- Информация о переводчике -->
+            <div class="translator-info">
+                <a href="#" class="translator-link">
+                    <div class="translator-avatar">
+                        <img src="/api/placeholder/48/48" alt="TowerTeam">
+                    </div>
+                    <div class="translator-details">
+                        <span class="translator-name">TowerTeam</span>
+                        <span class="translator-stats">256 переводов</span>
+                    </div>
+                    <div class="card-arrow">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 18l6-6-6-6"/>
+                        </svg>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Описание -->
+            <div class="novel-description">
+                <h2 class="section-title">О новелле</h2>
+                <p class="description-text">
+                    После трагической смерти талантливый программист получает второй шанс в мире меча и магии. 
+                    Вооруженный знаниями из прошлой жизни и решимостью преодолеть свою судьбу, он начинает свое 
+                    путешествие к вершине силы. Но что, если цена за могущество окажется слишком высокой?
+                </p>
+                <div class="novel-tags">
+                    <span class="tag">Фэнтези</span>
+                    <span class="tag">Приключения</span>
+                    <span class="tag">Боевик</span>
+                </div>
+            </div>
+
+            <!-- Главы -->
+            <div class="chapters-section">
+                <div class="section-header">
+                    <h2 class="section-title">Главы</h2>
+                    <div class="chapters-filter">
+                        <button class="filter-button">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/>
+                            </svg>
+                            Фильтры
+                        </button>
+                        <button class="sort-button">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M11 5h10M11 9h7M11 13h4M3 17h18M3 5l4 4-4 4"/>
+                            </svg>
+                            По номеру
+                        </button>
+                    </div>
+                </div>
+
+                <div class="chapters-list">
+                    <!-- Непрочитанная глава -->
+                    <div class="chapter-card unread">
+                        <div class="chapter-content">
+                            <h3 class="chapter-title">Глава 156: Начало конца</h3>
+                            <div class="chapter-details">
+                                <div class="chapter-meta">
+                                    <span class="chapter-date">Сегодня</span>
+                                    <div class="chapter-stats">
+                                        <span class="stat">
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                                <circle cx="12" cy="12" r="3"/>
+                                            </svg>
+                                            1.2K
+                                        </span>
+                                        <span class="stat">
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                                            </svg>
+                                            24
+                                        </span>
+                                    </div>
+                                </div>
+                                <button class="action-button read">Читать</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Прочитанная глава -->
+                    <div class="chapter-card read">
+                        <div class="chapter-content">
+                            <h3 class="chapter-title">Глава 155: Тайны прошлого</h3>
+                            <div class="chapter-details">
+                                <div class="chapter-meta">
+                                    <span class="chapter-date">Вчера</span>
+                                    <div class="chapter-stats">
+                                        <span class="stat">
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                                <circle cx="12" cy="12" r="3"/>
+                                            </svg>
+                                            2.1K
+                                        </span>
+                                        <span class="stat">
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                                            </svg>
+                                            46
+                                        </span>
+                                    </div>
+                                </div>
+                                <button class="action-button secondary">Перечитать</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="load-more">Загрузить еще</button>
+            </div>
+
+            <!-- Комментарии -->
+            <div class="comments-section">
+                <div class="section-header">
+                    <h2 class="section-title">Комментарии</h2>
+                    <span class="comments-count">128</span>
+                </div>
+
+                <div class="comments-list">
+                    <div class="comment-card">
+                        <div class="comment-header">
+                            <div class="comment-author">
+                                <img src="/api/placeholder/32/32" alt="User Avatar" class="author-avatar">
+                                <span class="author-name">Александр</span>
+                            </div>
+                            <span class="comment-date">2 часа назад</span>
+                        </div>
+                        <p class="comment-text">
+                            Очень интересный поворот сюжета в последней главе! Не ожидал такого раскрытия персонажа.
+                        </p>
+                        <div class="comment-actions">
+                            <button class="comment-action">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                </svg>
+                                12
+                            </button>
+                            <button class="comment-action">Ответить</button>
+                        </div>
+                    </div>
+
+                    <div class="comment-card">
+                        <div class="comment-header">
+                            <div class="comment-author">
+                                <img src="/api/placeholder/32/32" alt="User Avatar" class="author-avatar">
+                                <span class="author-name">Мария</span>
+                            </div>
+                            <span class="comment-date">Вчера</span>
+                        </div>
+                        <p class="comment-text">
+                            С каждой главой перевод становится все лучше и лучше. Спасибо команде за работу!
+                        </p>
+                        <div class="comment-actions">
+                            <button class="comment-action">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                </svg>
+                                8
+                            </button>
+                            <button class="comment-action">Ответить</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="comment-form">
+                    <textarea placeholder="Написать комментарий..." class="comment-input"></textarea>
+                    <button class="action-button primary">Отправить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/novel.js"></script>
+</body>
+</html>
