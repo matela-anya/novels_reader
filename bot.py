@@ -13,15 +13,13 @@ async def start(update, context):
     ], resize_keyboard=True)
     
     await update.message.reply_text(
-        'Добро пожаловать! Нажмите кнопку ниже, чтобы открыть читалку:',
+        'Добро пожаловать в Novels Reader! Нажмите кнопку ниже, чтобы открыть приложение:',
         reply_markup=keyboard
     )
 
 def main():
     application = Application.builder().token(BOT_TOKEN).build()
-    
     application.add_handler(CommandHandler("start", start))
-    
     application.run_polling()
 
 if __name__ == '__main__':
