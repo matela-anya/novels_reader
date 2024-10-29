@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Novels Reader</title>
+    <link rel="manifest" href="manifest.json">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/novel.css">
 </head>
 <body>
     <div class="app-container">
@@ -28,7 +30,7 @@
                 <section class="subscriptions">
                     <h2 class="section-title">Мои подписки</h2>
                     <div class="novels-list">
-                        <a href="#" class="novel-card">
+                        <a href="novel.html?id=1" class="novel-card">
                             <div class="novel-info">
                                 <h3 class="novel-title">Возрождение после смерти</h3>
                                 <div class="novel-meta">
@@ -43,7 +45,7 @@
                             </div>
                         </a>
                         
-                        <a href="#" class="novel-card">
+                        <a href="novel.html?id=2" class="novel-card">
                             <div class="novel-info">
                                 <h3 class="novel-title">Монарх упадка</h3>
                                 <div class="novel-meta">
@@ -93,5 +95,127 @@
             </div>
         </main>
     </div>
+
+    <!-- Модальное окно регистрации переводчика -->
+    <div class="modal-overlay" id="translatorModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Регистрация переводчика</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-content">
+                <form class="translator-form" id="translatorForm" novalidate>
+                    <div class="form-group">
+                        <label class="form-label">Аватар</label>
+                        <div class="avatar-upload">
+                            <div class="avatar-container">
+                                <div class="avatar-preview">
+                                    <img id="avatarPreview" src="api/placeholder/80/80" alt="Аватар">
+                                    <div class="upload-progress">
+                                        <div class="upload-progress-bar"></div>
+                                    </div>
+                                </div>
+                                <div class="avatar-actions">
+                                    <button type="button" class="avatar-action-button" id="changeAvatar">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M3 17v3a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-3"/>
+                                            <polyline points="16 6 12 2 8 6"/>
+                                            <line x1="12" y1="2" x2="12" y2="16"/>
+                                        </svg>
+                                    </button>
+                                    <button type="button" class="avatar-action-button" id="removeAvatar">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M3 6h18"/>
+                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
+                                            <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <input type="file" id="avatarInput" accept="image/*" style="display: none">
+                        </div>
+                        <div class="upload-hint">Рекомендуемый размер: 200x200px, до 1MB</div>
+                        <div class="upload-error" id="uploadError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Имя переводчика *</label>
+                        <input 
+                            type="text" 
+                            class="form-input" 
+                            name="translatorName" 
+                            required 
+                            minlength="2" 
+                            maxlength="50" 
+                            pattern="^[а-яА-ЯёЁa-zA-Z0-9\s-]+$"
+                            placeholder="Как вас будут видеть читатели"
+                        >
+                        <div class="error-message" data-error="translatorName"></div>
+                        <div class="character-counter">0/50</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">О себе *</label>
+                        <textarea 
+                            class="form-input" 
+                            name="description" 
+                            required 
+                            minlength="50" 
+                            maxlength="500" 
+                            placeholder="Расскажите о своем опыте перевода, любимых жанрах и т.д."
+                        ></textarea>
+                        <div class="error-message" data-error="description"></div>
+                        <div class="character-counter">0/500</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Социальные сети</label>
+                        <div class="social-links">
+                            <div class="social-input">
+                                <span>Telegram:</span>
+                                <input 
+                                    type="text" 
+                                    class="form-input" 
+                                    name="telegram"
+                                    pattern="^@[a-zA-Z0-9_]{5,32}$"
+                                    placeholder="@username"
+                                >
+                                <div class="error-message" data-error="telegram"></div>
+                            </div>
+                            <div class="social-input">
+                                <span>Discord:</span>
+                                <input 
+                                    type="text" 
+                                    class="form-input" 
+                                    name="discord"
+                                    pattern="^.{2,32}#[0-9]{4}$"
+                                    placeholder="username#0000"
+                                >
+                                <div class="error-message" data-error="discord"></div>
+                            </div>
+                            <div class="social-input">
+                                <span>VK:</span>
+                                <input 
+                                    type="text" 
+                                    class="form-input" 
+                                    name="vk"
+                                    pattern="^(https?:\/\/)?(vk\.com\/)[a-zA-Z0-9_-]+$"
+                                    placeholder="vk.com/username"
+                                >
+                                <div class="error-message" data-error="vk"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit-button" id="submitButton">
+                        Стать переводчиком
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Загрузка скриптов -->
+    <script src="js/app.js"></script>
 </body>
 </html>
