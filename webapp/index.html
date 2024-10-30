@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
     <title>Novels Reader</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="/webapp/css/styles.css">
 </head>
 <body>
     <div class="app-container">
@@ -14,27 +15,25 @@
             <div class="header-content">
                 <div class="header-top">
                     <h1 class="app-title">Novels Reader</h1>
-                    <button class="become-translator">Стать переводчиком</button>
+                    <button type="button" class="become-translator">Стать переводчиком</button>
                 </div>
-
                 <div class="search-bar">
-                    <input type="text" class="search-input" placeholder="Поиск новелл или переводчиков...">
+                    <input type="text" 
+                           class="search-input" 
+                           placeholder="Поиск новелл или переводчиков..."
+                           aria-label="Поиск">
                 </div>
             </div>
         </header>
 
-        <!-- Основной контент -->
-        <main class="main-content">
-            <!-- Заголовок кабинета -->
-            <h2 class="cabinet-title">Кабинет читателя</h2>
+        <h2 class="cabinet-title">Кабинет читателя</h2>
 
-            <!-- Подписки -->
+        <main class="main-content">
+            <!-- Мои подписки -->
             <section class="section subscriptions">
                 <h2 class="section-title">Мои подписки</h2>
-                
                 <div class="novels-list">
-                    <!-- Карточка новеллы -->
-                    <a href="novel.html?id=1" class="novel-card">
+                    <a href="/webapp/novel.html?id=1" class="novel-card">
                         <div class="novel-info">
                             <h3 class="novel-title">Возрождение после смерти</h3>
                             <div class="novel-meta">
@@ -49,8 +48,7 @@
                         </div>
                     </a>
 
-                    <!-- Карточка новеллы -->
-                    <a href="novel.html?id=2" class="novel-card">
+                    <a href="/webapp/novel.html?id=2" class="novel-card">
                         <div class="novel-info">
                             <h3 class="novel-title">Монарх упадка</h3>
                             <div class="novel-meta">
@@ -70,9 +68,7 @@
             <!-- Последние главы -->
             <section class="section latest-chapters">
                 <h2 class="section-title">Последние главы</h2>
-                
                 <div class="chapters-list">
-                    <!-- Глава -->
                     <div class="chapter-card">
                         <div class="chapter-content">
                             <h3 class="chapter-title">Глава 156: Начало конца</h3>
@@ -81,12 +77,11 @@
                                     <span class="novel-name">Возрождение после смерти</span>
                                     <span class="chapter-date">Сегодня</span>
                                 </div>
-                                <button class="action-button">Читать</button>
+                                <button type="button" class="action-button">Читать</button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Глава -->
                     <div class="chapter-card">
                         <div class="chapter-content">
                             <h3 class="chapter-title">Глава 89: Последний бой</h3>
@@ -95,7 +90,7 @@
                                     <span class="novel-name">Монарх упадка</span>
                                     <span class="chapter-date">Вчера</span>
                                 </div>
-                                <button class="action-button">Читать</button>
+                                <button type="button" class="action-button">Читать</button>
                             </div>
                         </div>
                     </div>
@@ -109,10 +104,10 @@
         <div class="modal">
             <div class="modal-header">
                 <h2 class="modal-title">Регистрация переводчика</h2>
-                <button class="modal-close">&times;</button>
+                <button type="button" class="modal-close" aria-label="Закрыть">&times;</button>
             </div>
             <div class="modal-content">
-                <form id="translatorForm">
+                <form id="translatorForm" novalidate>
                     <!-- Аватар -->
                     <div class="form-group">
                         <label>Аватар</label>
@@ -126,14 +121,14 @@
                                 </div>
                             </div>
                             <div class="avatar-actions">
-                                <button type="button" class="avatar-button" onclick="document.getElementById('avatarInput').click()">
+                                <button type="button" class="avatar-button" aria-label="Загрузить аватар" onclick="document.getElementById('avatarInput').click()">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path d="M3 17v3a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-3" />
                                         <polyline points="16 6 12 2 8 6"></polyline>
                                         <line x1="12" y1="2" x2="12" y2="16"></line>
                                     </svg>
                                 </button>
-                                <button type="button" class="avatar-button" id="removeAvatar">
+                                <button type="button" class="avatar-button" id="removeAvatar" aria-label="Удалить аватар">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path d="M3 6h18" />
                                         <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
@@ -142,20 +137,26 @@
                                 </button>
                             </div>
                         </div>
-                        <input type="file" id="avatarInput" accept="image/*" style="display: none">
+                        <input type="file" 
+                               id="avatarInput" 
+                               accept="image/*" 
+                               style="display: none"
+                               aria-label="Выбрать файл аватара">
                         <div class="upload-hint">Рекомендуемый размер: 200x200px, до 1MB</div>
                         <div class="error-message" data-error="avatar"></div>
                     </div>
 
                     <!-- Имя переводчика -->
                     <div class="form-group">
-                        <label>Имя переводчика *</label>
+                        <label for="translatorName">Имя переводчика *</label>
                         <input type="text" 
+                               id="translatorName"
                                name="translatorName" 
                                class="form-input" 
                                required 
                                minlength="2" 
                                maxlength="50" 
+                               pattern="[A-Za-zА-Яа-я0-9\s\-]+" 
                                placeholder="Как вас будут видеть читатели">
                         <div class="error-message" data-error="translatorName"></div>
                         <div class="character-counter">0/50</div>
@@ -163,14 +164,15 @@
 
                     <!-- О себе -->
                     <div class="form-group">
-                        <label>О себе *</label>
-                        <textarea name="description" 
-                                 class="form-input" 
-                                 required 
-                                 minlength="50" 
-                                 maxlength="500" 
-                                 rows="4" 
-                                 placeholder="Расскажите о своем опыте перевода, любимых жанрах"></textarea>
+                        <label for="description">О себе *</label>
+                        <textarea id="description"
+                                  name="description" 
+                                  class="form-input" 
+                                  required 
+                                  minlength="50" 
+                                  maxlength="500" 
+                                  rows="4" 
+                                  placeholder="Расскажите о своем опыте перевода, любимых жанрах"></textarea>
                         <div class="error-message" data-error="description"></div>
                         <div class="character-counter">0/500</div>
                     </div>
@@ -180,8 +182,9 @@
                         <label>Социальные сети</label>
                         <div class="social-links">
                             <div class="social-input">
-                                <label>Telegram:</label>
+                                <label for="telegram">Telegram:</label>
                                 <input type="text" 
+                                       id="telegram"
                                        name="telegram" 
                                        class="form-input" 
                                        pattern="@[A-Za-z0-9_]{5,32}" 
@@ -190,8 +193,9 @@
                             </div>
 
                             <div class="social-input">
-                                <label>Discord:</label>
+                                <label for="discord">Discord:</label>
                                 <input type="text" 
+                                       id="discord"
                                        name="discord" 
                                        class="form-input" 
                                        placeholder="username#0000">
@@ -199,8 +203,9 @@
                             </div>
 
                             <div class="social-input">
-                                <label>VK:</label>
+                                <label for="vk">VK:</label>
                                 <input type="text" 
+                                       id="vk"
                                        name="vk" 
                                        class="form-input" 
                                        placeholder="vk.com/username">
@@ -209,12 +214,16 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="become-translator">Стать переводчиком</button>
+                    <!-- Кнопка отправки -->
+                    <button type="submit" class="become-translator">
+                        Стать переводчиком
+                    </button>
                 </form>
             </div>
         </div>
     </div>
 
-    <script src="app.js"></script>
+    <!-- Скрипты -->
+    <script src="/webapp/js/app.js"></script>
 </body>
 </html>
