@@ -5,14 +5,14 @@
 }
 
 /* Шапка с обложкой */
-.novel-header {
+.novel-page .novel-header {
     position: relative;
     background: var(--tg-theme-secondary-bg-color);
     padding: 16px;
     margin: -16px -16px 0;
 }
 
-.novel-cover {
+.novel-page .novel-cover {
     width: 100%;
     max-width: 400px;
     margin: 0 auto;
@@ -22,33 +22,34 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.novel-cover img {
+.novel-page .novel-cover img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-.novel-header-content {
+.novel-page .novel-header-content {
     margin-top: 16px;
 }
 
-.novel-main-info {
+.novel-page .novel-main-info {
     margin-bottom: 16px;
 }
 
-.novel-title {
+/* Переопределяем стиль заголовка только для страницы новеллы */
+.novel-page .novel-title {
     font-size: 24px;
     font-weight: 700;
     margin-bottom: 8px;
     color: var(--tg-theme-text-color);
 }
 
-.novel-stats {
+.novel-page .novel-stats {
     display: flex;
     gap: 16px;
 }
 
-.stat {
+.novel-page .stat {
     display: flex;
     align-items: center;
     gap: 4px;
@@ -56,24 +57,22 @@
     font-size: 14px;
 }
 
-.novel-actions {
+.novel-page .novel-actions {
     display: flex;
     gap: 8px;
 }
 
-/* ... продолжение стилей ... */
-
 /* Основной контент */
-.novel-content {
+.novel-page .novel-content {
     padding: 16px;
 }
 
 /* Информация о переводчике */
-.translator-info {
+.novel-page .translator-info {
     margin-bottom: 24px;
 }
 
-.translator-link {
+.novel-page .translator-link {
     display: flex;
     align-items: center;
     gap: 12px;
@@ -84,54 +83,54 @@
     border-radius: 12px;
 }
 
-.translator-avatar {
+.novel-page .translator-avatar {
     width: 48px;
     height: 48px;
     border-radius: 50%;
     overflow: hidden;
 }
 
-.translator-avatar img {
+.novel-page .translator-avatar img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-.translator-details {
+.novel-page .translator-details {
     flex: 1;
 }
 
-.translator-name {
+.novel-page .translator-name {
     font-size: 16px;
     font-weight: 600;
     color: var(--tg-theme-text-color);
     margin-bottom: 4px;
 }
 
-.translator-stats {
+.novel-page .translator-stats {
     font-size: 14px;
     color: var(--tg-theme-hint-color);
 }
 
 /* Описание */
-.novel-description {
+.novel-page .novel-description {
     margin-bottom: 24px;
 }
 
-.description-text {
+.novel-page .description-text {
     font-size: 15px;
     line-height: 1.5;
     color: var(--tg-theme-text-color);
     margin-bottom: 12px;
 }
 
-.novel-tags {
+.novel-page .novel-tags {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
 }
 
-.tag {
+.novel-page .tag {
     background: var(--tg-theme-secondary-bg-color);
     padding: 4px 12px;
     border-radius: 16px;
@@ -140,24 +139,24 @@
 }
 
 /* Секция глав */
-.chapters-section {
+.novel-page .chapters-section {
     margin-bottom: 24px;
 }
 
-.section-header {
+.novel-page .section-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 16px;
 }
 
-.chapters-filter {
+.novel-page .chapters-filter {
     display: flex;
     gap: 8px;
 }
 
-.filter-button,
-.sort-button {
+.novel-page .filter-button,
+.novel-page .sort-button {
     display: flex;
     align-items: center;
     gap: 4px;
@@ -170,7 +169,7 @@
 }
 
 /* Карточки глав */
-.chapter-card {
+.novel-page .chapter-card {
     background: var(--tg-theme-bg-color);
     border: 1px solid var(--card-border);
     border-radius: 12px;
@@ -178,43 +177,16 @@
     margin-bottom: 12px;
 }
 
-.chapter-card.unread .chapter-title {
+.novel-page .chapter-card.unread .chapter-title {
     color: var(--tg-theme-button-color);
 }
 
-.chapter-card.read {
+.novel-page .chapter-card.read {
     opacity: 0.8;
 }
 
-.chapter-content {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.chapter-details {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.chapter-meta {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.chapter-date {
-    font-size: 14px;
-    color: var(--tg-theme-hint-color);
-}
-
-.chapter-stats {
-    display: flex;
-    gap: 12px;
-}
-
-.load-more {
+/* Остальные стили глав */
+.novel-page .load-more {
     width: 100%;
     padding: 12px;
     border: 1px solid var(--card-border);
@@ -226,92 +198,26 @@
 }
 
 /* Комментарии */
-.comments-section {
+.novel-page .comments-section {
     margin-top: 24px;
 }
 
-.comments-count {
+.novel-page .comments-count {
     font-size: 14px;
     color: var(--tg-theme-hint-color);
 }
 
-.comment-card {
+.novel-page .comment-card {
     padding: 16px;
     border: 1px solid var(--card-border);
     border-radius: 12px;
     margin-bottom: 12px;
 }
 
-.comment-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
-}
-
-.comment-author {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.author-avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-}
-
-.author-name {
-    font-size: 14px;
-    font-weight: 500;
-}
-
-.comment-date {
-    font-size: 12px;
-    color: var(--tg-theme-hint-color);
-}
-
-.comment-text {
-    font-size: 14px;
-    line-height: 1.5;
-    margin-bottom: 12px;
-}
-
-.comment-actions {
-    display: flex;
-    gap: 16px;
-}
-
-.comment-action {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    background: none;
-    border: none;
-    color: var(--tg-theme-hint-color);
-    font-size: 13px;
-    padding: 4px 0;
-}
-
-.comment-form {
-    margin-top: 24px;
-}
-
-.comment-input {
-    width: 100%;
-    min-height: 80px;
-    padding: 12px;
-    border: 1px solid var(--card-border);
-    border-radius: 12px;
-    background: var(--tg-theme-secondary-bg-color);
-    color: var(--tg-theme-text-color);
-    font-size: 14px;
-    margin-bottom: 12px;
-    resize: vertical;
-}
+/* Остальные стили комментариев */
 
 /* Кнопки */
-.action-button {
+.novel-page .action-button {
     padding: 8px 16px;
     border-radius: 8px;
     font-size: 14px;
@@ -321,39 +227,39 @@
     transition: opacity 0.2s;
 }
 
-.action-button.primary {
+.novel-page .action-button.primary {
     background: var(--tg-theme-button-color);
     color: var(--tg-theme-button-text-color);
 }
 
-.action-button.secondary {
+.novel-page .action-button.secondary {
     background: var(--tg-theme-secondary-bg-color);
     color: var(--tg-theme-text-color);
 }
 
-.action-button.bookmark {
+.novel-page .action-button.bookmark {
     padding: 8px;
 }
 
-.action-button.bookmark.active {
+.novel-page .action-button.bookmark.active {
     color: var(--tg-theme-button-color);
 }
 
 /* Адаптивность */
 @media (min-width: 768px) {
-    .novel-header {
+    .novel-page .novel-header {
         display: flex;
         gap: 24px;
         align-items: flex-start;
     }
 
-    .novel-cover {
+    .novel-page .novel-cover {
         flex-shrink: 0;
         width: 300px;
         margin: 0;
     }
 
-    .novel-header-content {
+    .novel-page .novel-header-content {
         margin-top: 0;
         flex: 1;
     }
