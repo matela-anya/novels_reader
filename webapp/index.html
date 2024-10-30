@@ -17,11 +17,8 @@
                     <button class="become-translator">Стать переводчиком</button>
                 </div>
 
-                <!-- Поиск -->
                 <div class="search-bar">
-                    <input type="text" 
-                           class="search-input" 
-                           placeholder="Поиск новелл или переводчиков...">
+                    <input type="text" class="search-input" placeholder="Поиск новелл или переводчиков...">
                 </div>
             </div>
         </header>
@@ -30,13 +27,12 @@
         <h2 class="cabinet-title">Кабинет читателя</h2>
 
         <!-- Основной контент -->
-        <main class="main-content" role="main">
+        <main class="main-content">
             <!-- Секция подписок -->
             <section class="section subscriptions">
                 <h2 class="section-title">Мои подписки</h2>
                 
                 <div class="novels-list">
-                    <!-- Карточка новеллы -->
                     <a href="novel.html?id=1" class="novel-card">
                         <div class="novel-info">
                             <h3 class="novel-title">Возрождение после смерти</h3>
@@ -52,7 +48,6 @@
                         </div>
                     </a>
 
-                    <!-- Карточка новеллы -->
                     <a href="novel.html?id=2" class="novel-card">
                         <div class="novel-info">
                             <h3 class="novel-title">Монарх упадка</h3>
@@ -75,7 +70,6 @@
                 <h2 class="section-title">Последние главы</h2>
                 
                 <div class="chapters-list">
-                    <!-- Карточка главы -->
                     <div class="chapter-card">
                         <div class="chapter-content">
                             <h3 class="chapter-title">Глава 156: Начало конца</h3>
@@ -84,12 +78,11 @@
                                     <span class="novel-name">Возрождение после смерти</span>
                                     <span class="chapter-date">Сегодня</span>
                                 </div>
-                                <button class="action-button read">Читать</button>
+                                <button class="action-button">Читать</button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Карточка главы -->
                     <div class="chapter-card">
                         <div class="chapter-content">
                             <h3 class="chapter-title">Глава 89: Последний бой</h3>
@@ -98,7 +91,7 @@
                                     <span class="novel-name">Монарх упадка</span>
                                     <span class="chapter-date">Вчера</span>
                                 </div>
-                                <button class="action-button read">Читать</button>
+                                <button class="action-button">Читать</button>
                             </div>
                         </div>
                     </div>
@@ -107,7 +100,7 @@
         </main>
     </div>
 
-    <!-- Модальное окно регистрации переводчика -->
+    <!-- Модальное окно регистрации -->
     <div id="translatorModal" class="modal-overlay">
         <div class="modal">
             <div class="modal-header">
@@ -150,7 +143,7 @@
                         <div class="error-message" data-error="avatar"></div>
                     </div>
 
-                    <!-- Имя переводчика -->
+                    <!-- Поля формы -->
                     <div class="form-group">
                         <label>Имя переводчика *</label>
                         <input type="text" 
@@ -159,13 +152,11 @@
                                required 
                                minlength="2" 
                                maxlength="50" 
-                               pattern="[A-Za-zА-Яа-я0-9\s\-]+" 
                                placeholder="Как вас будут видеть читатели">
                         <div class="error-message" data-error="translatorName"></div>
                         <div class="character-counter">0/50</div>
                     </div>
 
-                    <!-- О себе -->
                     <div class="form-group">
                         <label>О себе *</label>
                         <textarea name="description" 
@@ -198,7 +189,6 @@
                                 <input type="text" 
                                        name="discord" 
                                        class="form-input" 
-                                       pattern="[A-Za-z0-9_]{3,32}#[0-9]{4}" 
                                        placeholder="username#0000">
                                 <div class="error-message" data-error="discord"></div>
                             </div>
@@ -208,23 +198,18 @@
                                 <input type="text" 
                                        name="vk" 
                                        class="form-input" 
-                                       pattern="(vk\.com\/)[A-Za-z0-9_\-]+" 
                                        placeholder="vk.com/username">
                                 <div class="error-message" data-error="vk"></div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Кнопка отправки -->
-                    <button type="submit" class="become-translator">
-                        Стать переводчиком
-                    </button>
+                    <button type="submit" class="become-translator">Стать переводчиком</button>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- Скрипты -->
-    <script src="js/app.js"></script>
+    <script src="/webapp/js/app.js"></script>
 </body>
 </html>
