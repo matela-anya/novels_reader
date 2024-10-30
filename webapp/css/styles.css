@@ -1,16 +1,39 @@
+/* Определение переменных для тем */
+:root {
+    /* Базовые цвета для светлой темы */
+    --tg-theme-bg-color: #ffffff;
+    --tg-theme-text-color: #000000;
+    --tg-theme-hint-color: #999999;
+    --tg-theme-link-color: #2481cc;
+    --tg-theme-button-color: #2481cc;
+    --tg-theme-button-text-color: #ffffff;
+    --tg-theme-secondary-bg-color: #f0f0f0;
+    
+    /* Кастомные цвета */
+    --card-border: rgba(0, 0, 0, 0.08);
+}
+
+/* Темная тема */
 [data-theme="dark"] {
     --tg-theme-bg-color: #1a1a1a;
     --tg-theme-text-color: #ffffff;
     --tg-theme-hint-color: #aaaaaa;
     --tg-theme-link-color: #64b5f6;
+    --tg-theme-button-color: #7c5dfa;
+    --tg-theme-button-text-color: #ffffff;
     --tg-theme-secondary-bg-color: #2d2d2d;
     --card-border: rgba(255, 255, 255, 0.08);
 }
 
+/* Базовые стили */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
 }
 
 body {
@@ -21,9 +44,12 @@ body {
     line-height: 1.3;
 }
 
+/* Контейнер приложения */
 .app-container {
     max-width: 800px;
     margin: 0 auto;
+    min-height: 100%;
+    padding: 16px;
 }
 
 /* Шапка */
@@ -33,7 +59,7 @@ body {
     background: var(--tg-theme-bg-color);
     z-index: 100;
     border-bottom: 1px solid var(--card-border);
-    margin-bottom: 16px;
+    margin: -16px -16px 16px -16px;
 }
 
 .header-content {
@@ -50,8 +76,10 @@ body {
 .app-title {
     font-size: 20px;
     font-weight: 600;
+    color: var(--tg-theme-text-color);
 }
 
+/* Кнопка регистрации переводчика */
 .become-translator {
     background: var(--tg-theme-button-color);
     color: var(--tg-theme-button-text-color);
@@ -59,11 +87,156 @@ body {
     padding: 8px 16px;
     border-radius: 8px;
     font-size: 14px;
+    font-weight: 500;
     cursor: pointer;
     transition: opacity 0.2s;
 }
 
 .become-translator:active {
+    opacity: 0.8;
+}
+
+/* Поиск */
+.search-bar {
+    position: relative;
+}
+
+.search-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    background: var(--tg-theme-secondary-bg-color);
+    color: var(--tg-theme-text-color);
+    font-size: 16px;
+}
+
+.search-input::placeholder {
+    color: var(--tg-theme-hint-color);
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--tg-theme-button-color);
+}
+
+/* Заголовок кабинета */
+.cabinet-title {
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--tg-theme-text-color);
+    margin-bottom: 16px;
+}
+
+/* Основной контент */
+.main-content {
+    flex: 1;
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--tg-theme-text-color);
+    margin: 24px 0 12px;
+}
+
+/* Списки новелл и глав */
+.novels-list,
+.chapters-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Карточка новеллы */
+.novel-card {
+    background: var(--tg-theme-bg-color);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+    transition: background-color 0.2s;
+}
+
+.novel-card:active {
+    background: var(--tg-theme-secondary-bg-color);
+}
+
+.novel-info {
+    flex: 1;
+    padding-right: 12px;
+}
+
+.novel-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--tg-theme-text-color);
+    margin-bottom: 6px;
+}
+
+.novel-meta {
+    display: flex;
+    gap: 12px;
+    font-size: 14px;
+    color: var(--tg-theme-hint-color);
+}
+
+.card-arrow {
+    color: var(--tg-theme-hint-color);
+}
+
+/* Карточка главы */
+.chapter-card {
+    background: var(--tg-theme-bg-color);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.chapter-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.chapter-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--tg-theme-text-color);
+}
+
+.chapter-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chapter-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 14px;
+    color: var(--tg-theme-hint-color);
+}
+
+/* Кнопка читать */
+.action-button {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    background: var(--tg-theme-button-color);
+    color: var(--tg-theme-button-text-color);
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.action-button:active {
     opacity: 0.8;
 }
 
@@ -97,6 +270,17 @@ body {
     animation: modalShow 0.3s ease;
 }
 
+@keyframes modalShow {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 .modal-header {
     padding: 16px;
     border-bottom: 1px solid var(--card-border);
@@ -122,17 +306,6 @@ body {
 
 .modal-content {
     padding: 16px;
-}
-
-@keyframes modalShow {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
 }
 
 /* Форма регистрации */
@@ -171,7 +344,6 @@ body {
 .avatar-upload {
     display: flex;
     gap: 16px;
-    margin-bottom: 16px;
 }
 
 .avatar-container {
@@ -192,29 +364,6 @@ body {
     width: 100%;
     height: 100%;
     object-fit: cover;
-}
-
-.upload-progress {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: var(--tg-theme-secondary-bg-color);
-    border-radius: 2px;
-    overflow: hidden;
-    display: none;
-}
-
-.upload-progress.visible {
-    display: block;
-}
-
-.upload-progress-bar {
-    height: 100%;
-    background: var(--tg-theme-button-color);
-    width: 0;
-    transition: width 0.3s;
 }
 
 .avatar-actions {
@@ -241,36 +390,7 @@ body {
     margin-top: 4px;
 }
 
-/* Социальные сети */
-.social-links {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.social-input {
-    margin-bottom: 12px;
-}
-
-.social-input label {
-    display: block;
-    font-size: 14px;
-    color: var(--tg-theme-text-color);
-    margin-bottom: 4px;
-}
-
-/* Счетчик символов и ошибки */
-.character-counter {
-    font-size: 12px;
-    color: var(--tg-theme-hint-color);
-    text-align: right;
-    margin-top: 4px;
-}
-
-.character-counter.limit {
-    color: #ff3b30;
-}
-
+/* Валидация */
 .error-message {
     display: none;
     color: #ff3b30;
@@ -282,12 +402,31 @@ body {
     display: block;
 }
 
+.character-counter {
+    font-size: 12px;
+    color: var(--tg-theme-hint-color);
+    text-align: right;
+    margin-top: 4px;
+}
+
+.character-counter.limit {
+    color: #ff3b30;
+}
+
 /* Адаптивность */
 @media (max-width: 480px) {
+    .app-container {
+        padding: 12px;
+    }
+
+    .header-content {
+        padding: 12px;
+    }
+
     .modal {
         margin: 0;
-        max-height: 100vh;
-        overflow-y: auto;
+        height: 100%;
+        border-radius: 0;
     }
 
     .modal-overlay {
