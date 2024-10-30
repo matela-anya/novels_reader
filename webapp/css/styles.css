@@ -63,14 +63,96 @@ body {
     padding: 8px 16px;
     border-radius: 8px;
     font-size: 14px;
+    cursor: pointer;
+    transition: opacity 0.2s;
 }
 
-/* Поиск */
-.search-bar {
+.become-translator:active {
+    opacity: 0.8;
+}
+
+/* Модальное окно */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    z-index: 1000;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.modal-overlay.visible {
+    display: flex;
+}
+
+.modal {
+    background: var(--tg-theme-bg-color);
+    border-radius: 12px;
+    width: 100%;
+    max-width: 480px;
+    margin: auto;
     position: relative;
+    animation: modalShow 0.3s ease;
 }
 
-.search-input {
+.modal-header {
+    padding: 16px;
+    border-bottom: 1px solid var(--card-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--tg-theme-text-color);
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    color: var(--tg-theme-hint-color);
+    padding: 4px;
+    cursor: pointer;
+    font-size: 24px;
+}
+
+.modal-content {
+    padding: 16px;
+}
+
+@keyframes modalShow {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Форма регистрации */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: var(--tg-theme-text-color);
+}
+
+.form-input {
     width: 100%;
     padding: 12px;
     border: 1px solid var(--card-border);
@@ -80,148 +162,139 @@ body {
     font-size: 16px;
 }
 
-.search-input::placeholder {
+.form-input::placeholder {
     color: var(--tg-theme-hint-color);
 }
 
-/* Заголовок кабинета */
-.cabinet-title {
-    font-size: 20px;
-    font-weight: 500;
-    color: var(--tg-theme-text-color);
-    padding: 0 16px 12px;
+.form-input:focus {
+    outline: none;
+    border-color: var(--tg-theme-button-color);
 }
 
-/* Основной контент */
-.main-content {
-    padding: 0 16px;
-}
-
-.section-title {
-    font-size: 18px;
-    font-weight: 600;
-    margin: 24px 0 12px;
-}
-
-/* Карточки подписок */
-.novels-list, .chapters-list {
+/* Загрузка аватара */
+.avatar-upload {
     display: flex;
-    flex-direction: column;
-    gap: 12px;
+    gap: 16px;
+    margin-bottom: 16px;
 }
 
-.novel-card {
-    background: var(--tg-theme-bg-color);
-    border: 1px solid var(--card-border);
-    border-radius: 12px;
-    padding: 16px;
+.avatar-container {
+    position: relative;
+    width: 80px;
+    height: 80px;
+}
+
+.avatar-preview {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--tg-theme-secondary-bg-color);
+}
+
+.avatar-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.upload-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--tg-theme-secondary-bg-color);
+    border-radius: 2px;
+    overflow: hidden;
+    display: none;
+}
+
+.upload-progress.visible {
+    display: block;
+}
+
+.upload-progress-bar {
+    height: 100%;
+    background: var(--tg-theme-button-color);
+    width: 0;
+    transition: width 0.3s;
+}
+
+.avatar-actions {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    text-decoration: none;
-    color: inherit;
-    transition: background-color 0.2s;
-}
-
-.novel-card:active {
-    background-color: var(--tg-theme-secondary-bg-color);
-}
-
-.novel-info {
-    flex: 1;
-    padding-right: 12px;
-}
-
-.novel-title {
-    font-size: 16px;
-    font-weight: 600;
-    margin-bottom: 6px;
-    color: var(--tg-theme-text-color);
-}
-
-.novel-meta {
-    font-size: 14px;
-    color: var(--tg-theme-hint-color);
-    display: flex;
-    gap: 12px;
-}
-
-.card-arrow {
-    color: var(--tg-theme-hint-color);
-    display: flex;
-    align-items: center;
-}
-
-/* Карточки глав */
-.chapter-card {
-    background: var(--tg-theme-bg-color);
-    border: 1px solid var(--card-border);
-    border-radius: 12px;
-    padding: 16px;
-}
-
-.chapter-content {
-    display: flex;
-    flex-direction: column;
     gap: 8px;
 }
 
-.chapter-title {
-    font-size: 16px;
-    font-weight: 600;
-    margin-bottom: 6px;
-}
-
-.chapter-details {
+.avatar-button {
+    background: var(--tg-theme-secondary-bg-color);
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: center;
+    color: var(--tg-theme-text-color);
+    cursor: pointer;
 }
 
-.chapter-meta {
+.upload-hint {
+    font-size: 12px;
+    color: var(--tg-theme-hint-color);
+    margin-top: 4px;
+}
+
+/* Социальные сети */
+.social-links {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 12px;
 }
 
-.novel-name {
+.social-input {
+    margin-bottom: 12px;
+}
+
+.social-input label {
+    display: block;
     font-size: 14px;
+    color: var(--tg-theme-text-color);
+    margin-bottom: 4px;
+}
+
+/* Счетчик символов и ошибки */
+.character-counter {
+    font-size: 12px;
     color: var(--tg-theme-hint-color);
+    text-align: right;
+    margin-top: 4px;
 }
 
-.chapter-date {
-    font-size: 14px;
-    color: var(--tg-theme-hint-color);
+.character-counter.limit {
+    color: #ff3b30;
 }
 
-/* Кнопки */
-.action-button {
-    border: none;
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: opacity 0.2s;
+.error-message {
+    display: none;
+    color: #ff3b30;
+    font-size: 12px;
+    margin-top: 4px;
 }
 
-.action-button.read {
-    background: var(--tg-theme-button-color);
-    color: var(--tg-theme-button-text-color);
+.error-message.visible {
+    display: block;
 }
 
 /* Адаптивность */
 @media (max-width: 480px) {
-    .header-content {
-        padding: 12px;
+    .modal {
+        margin: 0;
+        max-height: 100vh;
+        overflow-y: auto;
     }
 
-    .main-content {
-        padding: 0 12px;
-    }
-
-    .cabinet-title {
-        padding: 0 12px 12px;
+    .modal-overlay {
+        padding: 0;
     }
 }
-
