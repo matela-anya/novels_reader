@@ -140,12 +140,12 @@
 }
 
 /* Темная тема */
-.dark-theme {
+[data-theme="dark"] .chapter-page {
     background: #1a1a1a;
     color: #ffffff;
 }
 
-.sepia-theme {
+[data-theme="sepia"] .chapter-page {
     background: #f4ecd8;
     color: #5b4636;
 }
