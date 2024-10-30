@@ -169,7 +169,7 @@ body {
 .chapter-title {
     font-size: 16px;
     font-weight: 600;
-    color: var(--tg-theme-text-color);
+    margin-bottom: 6px;
 }
 
 .chapter-details {
