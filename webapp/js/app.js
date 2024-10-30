@@ -1,4 +1,58 @@
-// Объект для обработки формы
+// Получаем экземпляр WebApp
+const tg = window.Telegram.WebApp;
+
+// Инициализация приложения
+function initializeApp() {
+    // Сообщаем WebApp что приложение готово
+    tg.ready();
+    // Раскрываем приложение на всю высоту
+    tg.expand();
+
+    // Настраиваем цветовую схему
+    const root = document.documentElement;
+    root.classList.toggle('dark', tg.colorScheme === 'dark');
+
+    // Устанавливаем цвета из WebApp
+    const colors = {
+        'bg-color': tg.backgroundColor,
+        'text-color': tg.textColor,
+        'hint-color': tg.themeParams?.hint_color,
+        'link-color': tg.themeParams?.link_color,
+        'button-color': tg.themeParams?.button_color,
+        'button-text-color': tg.themeParams?.button_text_color,
+        'secondary-bg-color': tg.themeParams?.secondary_bg_color
+    };
+
+    // Применяем цвета
+    Object.entries(colors).forEach(([key, value]) => {
+        if (value) {
+            root.style.setProperty(`--tg-theme-${key}`, value);
+        }
+    });
+
+    // Инициализируем главную кнопку
+    initMainButton();
+}
+
+// Настройка главной кнопки Telegram
+function initMainButton() {
+    tg.MainButton.setParams({
+        text: 'Стать переводчиком',
+        color: tg.themeParams?.button_color,
+        text_color: tg.themeParams?.button_text_color,
+        is_visible: false
+    });
+
+    // Добавляем обработчик на нажатие главной кнопки
+    tg.MainButton.onClick(() => {
+        const form = document.getElementById('translatorForm');
+        if (form) {
+            form.dispatchEvent(new Event('submit'));
+        }
+    });
+}
+
+// Обработчик формы
 const FormHandler = {
     errorMessages: {
         translatorName: {
@@ -38,17 +92,16 @@ const FormHandler = {
 
     updateCharacterCount(field) {
         const counter = field.closest('.form-group').querySelector('.character-counter');
-        if (counter) {
+        if (counter && field.maxLength) {
             const current = field.value.length;
-            const max = field.maxLength;
-            counter.textContent = `${current}/${max}`;
-            counter.classList.toggle('limit', current >= max);
+            counter.textContent = `${current}/${field.maxLength}`;
+            counter.classList.toggle('limit', current >= field.maxLength);
         }
     },
 
     async submitForm(formData) {
         try {
-            // Показываем индикатор загрузки
+            tg.MainButton.showProgress();
             document.body.style.cursor = 'wait';
             
             // Имитация отправки на сервер
@@ -58,43 +111,42 @@ const FormHandler = {
             localStorage.removeItem('translatorFormData');
 
             // Закрываем модальное окно
-            document.getElementById('translatorModal').classList.remove('visible');
+            const modal = document.getElementById('translatorModal');
+            modal.classList.remove('visible');
             document.body.style.overflow = '';
 
             // Уведомляем пользователя
-            if (window.Telegram?.WebApp) {
-                window.Telegram.WebApp.showPopup({
-                    title: 'Успешно!',
-                    message: 'Вы стали переводчиком',
-                    buttons: [{type: 'ok'}]
-                });
-            }
+            tg.showPopup({
+                title: 'Успешно!',
+                message: 'Вы стали переводчиком',
+                buttons: [{type: 'ok'}]
+            });
+
+            // Закрываем WebApp
+            tg.close();
         } catch (error) {
             console.error('Error submitting form:', error);
-            if (window.Telegram?.WebApp) {
-                window.Telegram.WebApp.showPopup({
-                    title: 'Ошибка',
-                    message: 'Не удалось отправить форму. Попробуйте позже.',
-                    buttons: [{type: 'ok'}]
-                });
-            }
+            tg.showPopup({
+                title: 'Ошибка',
+                message: 'Не удалось отправить форму. Попробуйте позже.',
+                buttons: [{type: 'ok'}]
+            });
         } finally {
+            tg.MainButton.hideProgress();
             document.body.style.cursor = '';
         }
     }
 };
 
-// Объект для работы с аватаром
+// Обработчик аватара
 const AvatarHandler = {
     maxSize: 1024 * 1024, // 1MB
 
     async processFile(file) {
-        // Проверка типа файла
         if (!file.type.startsWith('image/')) {
             throw new Error('Пожалуйста, выберите изображение');
         }
 
-        // Проверка размера
         if (file.size > this.maxSize) {
             throw new Error('Размер файла не должен превышать 1MB');
         }
@@ -109,9 +161,10 @@ const AvatarHandler = {
 
     removeAvatar() {
         const preview = document.getElementById('avatarPreview');
-        preview.src = '/api/placeholder/80/80';
+        if (preview) {
+            preview.src = '/api/placeholder/80/80';
+        }
         
-        // Очищаем input файла
         const input = document.getElementById('avatarInput');
         if (input) {
             input.value = '';
@@ -119,149 +172,122 @@ const AvatarHandler = {
     }
 };
 
-// Инициализация приложения
-document.addEventListener('DOMContentLoaded', function() {
-    // Инициализация Telegram WebApp
-    if (window.Telegram?.WebApp) {
-        const tg = window.Telegram.WebApp;
-        
-        // Инициализация веб-приложения
-        tg.ready();
-        tg.expand();
+// Инициализация модального окна
+function initModal() {
+    const modal = document.getElementById('translatorModal');
+    const openButton = document.querySelector('.become-translator');
+    const closeButton = document.querySelector('.modal-close');
 
-        // Применяем тему Telegram
-        document.documentElement.setAttribute('data-theme', tg.colorScheme);
-
-        // Применяем цвета из Telegram
-        if (tg.themeParams) {
-            document.documentElement.style.setProperty('--tg-theme-bg-color', tg.themeParams.bg_color);
-            document.documentElement.style.setProperty('--tg-theme-text-color', tg.themeParams.text_color);
-            document.documentElement.style.setProperty('--tg-theme-hint-color', tg.themeParams.hint_color);
-            document.documentElement.style.setProperty('--tg-theme-link-color', tg.themeParams.link_color);
-            document.documentElement.style.setProperty('--tg-theme-button-color', tg.themeParams.button_color);
-            document.documentElement.style.setProperty('--tg-theme-button-text-color', tg.themeParams.button_text_color);
-            document.documentElement.style.setProperty('--tg-theme-secondary-bg-color', tg.themeParams.secondary_bg_color);
-        }
-    } else {
-        // Fallback для тестирования вне Telegram
-        document.documentElement.setAttribute('data-theme', 'light');
+    if (openButton) {
+        openButton.addEventListener('click', () => {
+            modal.classList.add('visible');
+            document.body.style.overflow = 'hidden';
+            tg.MainButton.show();
+        });
     }
 
-    // Инициализация модального окна
-    const modal = {
-        overlay: document.getElementById('translatorModal'),
-        openButton: document.querySelector('.become-translator'),
-        closeButton: document.querySelector('.modal-close'),
-        
-        init() {
-            if (this.openButton) {
-                this.openButton.addEventListener('click', () => this.open());
-            }
-            if (this.closeButton) {
-                this.closeButton.addEventListener('click', () => this.close());
-            }
-            if (this.overlay) {
-                this.overlay.addEventListener('click', (e) => {
-                    if (e.target === this.overlay) {
-                        this.close();
-                    }
-                });
-            }
-        },
-
-        open() {
-            this.overlay.classList.add('visible');
-            document.body.style.overflow = 'hidden';
-        },
-
-        close() {
-            this.overlay.classList.remove('visible');
+    if (closeButton) {
+        closeButton.addEventListener('click', () => {
+            modal.classList.remove('visible');
             document.body.style.overflow = '';
-        }
-    };
+            tg.MainButton.hide();
+        });
+    }
 
-    // Инициализация формы
-    const form = {
-        element: document.getElementById('translatorForm'),
-        avatarInput: document.getElementById('avatarInput'),
-        removeAvatarButton: document.getElementById('removeAvatar'),
+    if (modal) {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('visible');
+                document.body.style.overflow = '';
+                tg.MainButton.hide();
+            }
+        });
+    }
+}
+
+// Инициализация формы
+function initForm() {
+    const form = document.getElementById('translatorForm');
+    if (!form) return;
+
+    // Обработка полей формы
+    form.querySelectorAll('.form-input').forEach(input => {
+        // Валидация при вводе
+        input.addEventListener('input', () => {
+            FormHandler.validateField(input);
+            FormHandler.updateCharacterCount(input);
+        });
+
+        // Валидация при потере фокуса
+        input.addEventListener('blur', () => {
+            FormHandler.validateField(input);
+        });
+
+        // Инициализация счетчика символов
+        if (input.maxLength) {
+            FormHandler.updateCharacterCount(input);
+        }
+    });
+
+    // Обработка отправки формы
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
         
-        init() {
-            if (this.element) {
-                this.initInputs();
-                this.initAvatarHandling();
-                this.element.addEventListener('submit', (e) => this.handleSubmit(e));
+        // Проверяем валидность всех обязательных полей
+        let isValid = true;
+        form.querySelectorAll('.form-input[required]').forEach(field => {
+            if (!FormHandler.validateField(field)) {
+                isValid = false;
             }
-        },
+        });
 
-        initInputs() {
-            this.element.querySelectorAll('.form-input').forEach(input => {
-                // Обработка ввода
-                input.addEventListener('input', () => {
-                    FormHandler.validateField(input);
-                    FormHandler.updateCharacterCount(input);
-                });
-
-                // Валидация при потере фокуса
-                input.addEventListener('blur', () => {
-                    FormHandler.validateField(input);
-                });
-
-                // Инициализация счетчика символов
-                if (input.maxLength) {
-                    FormHandler.updateCharacterCount(input);
-                }
+        if (!isValid) {
+            tg.showPopup({
+                title: 'Ошибка',
+                message: 'Пожалуйста, заполните все обязательные поля',
+                buttons: [{type: 'ok'}]
             });
-        },
-
-        initAvatarHandling() {
-            if (this.avatarInput) {
-                this.avatarInput.addEventListener('change', async (e) => {
-                    const file = e.target.files[0];
-                    if (!file) return;
-
-                    try {
-                        const imageUrl = await AvatarHandler.processFile(file);
-                        document.getElementById('avatarPreview').src = imageUrl;
-                    } catch (error) {
-                        if (window.Telegram?.WebApp) {
-                            window.Telegram.WebApp.showPopup({
-                                title: 'Ошибка',
-                                message: error.message,
-                                buttons: [{type: 'ok'}]
-                            });
-                        }
-                    }
-                });
-            }
-
-            if (this.removeAvatarButton) {
-                this.removeAvatarButton.addEventListener('click', () => {
-                    AvatarHandler.removeAvatar();
-                });
-            }
-        },
-
-        async handleSubmit(e) {
-            e.preventDefault();
-            
-            // Проверяем валидность всех обязательных полей
-            let isValid = true;
-            this.element.querySelectorAll('.form-input[required]').forEach(field => {
-                if (!FormHandler.validateField(field)) {
-                    isValid = false;
-                }
-            });
-
-            if (!isValid) return;
-
-            // Отправляем форму
-            const formData = new FormData(this.element);
-            await FormHandler.submitForm(formData);
+            return;
         }
-    };
 
-    // Инициализация всех компонентов
-    modal.init();
-    form.init();
+        // Отправляем форму
+        const formData = new FormData(form);
+        await FormHandler.submitForm(formData);
+    });
+
+    // Обработка аватара
+    const avatarInput = document.getElementById('avatarInput');
+    const removeAvatarButton = document.getElementById('removeAvatar');
+
+    if (avatarInput) {
+        avatarInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            try {
+                const imageUrl = await AvatarHandler.processFile(file);
+                document.getElementById('avatarPreview').src = imageUrl;
+            } catch (error) {
+                tg.showPopup({
+                    title: 'Ошибка',
+                    message: error.message,
+                    buttons: [{type: 'ok'}]
+                });
+            }
+        });
+    }
+
+    if (removeAvatarButton) {
+        removeAvatarButton.addEventListener('click', AvatarHandler.removeAvatar);
+    }
+}
+
+// Инициализация при загрузке страницы
+document.addEventListener('DOMContentLoaded', () => {
+    // Инициализируем приложение
+    initializeApp();
+    
+    // Инициализируем компоненты
+    initModal();
+    initForm();
 });
