@@ -1,0 +1,159 @@
+/* Стили страницы чтения */
+.chapter-page {
+    min-height: 100vh;
+    padding-bottom: 24px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Шапка главы */
+.chapter-header {
+    position: sticky;
+    top: 0;
+    background: var(--tg-theme-bg-color);
+    z-index: 100;
+    border-bottom: 1px solid var(--card-border);
+    padding: 12px 16px;
+}
+
+.chapter-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.chapter-nav-button {
+    background: var(--tg-theme-secondary-bg-color);
+    border: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    color: var(--tg-theme-text-color);
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.chapter-nav-button:disabled {
+    opacity: 0.5;
+}
+
+.chapter-info {
+    text-align: center;
+}
+
+.novel-name {
+    font-size: 14px;
+    color: var(--tg-theme-hint-color);
+    margin-bottom: 4px;
+}
+
+.chapter-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--tg-theme-text-color);
+}
+
+/* Контент главы */
+.chapter-content {
+    padding: 20px 16px;
+    font-size: 18px;
+    line-height: 1.6;
+    color: var(--tg-theme-text-color);
+}
+
+.chapter-content p {
+    margin-bottom: 1.5em;
+}
+
+/* Настройки чтения */
+.reading-settings {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--tg-theme-bg-color);
+    border-top: 1px solid var(--card-border);
+    padding: 16px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+}
+
+.reading-settings.visible {
+    transform: translateY(0);
+}
+
+.settings-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.settings-label {
+    font-size: 12px;
+    color: var(--tg-theme-hint-color);
+}
+
+.font-size-controls,
+.theme-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.control-button {
+    background: var(--tg-theme-secondary-bg-color);
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--tg-theme-text-color);
+}
+
+.control-button.active {
+    background: var(--tg-theme-button-color);
+    color: var(--tg-theme-button-text-color);
+}
+
+/* Прогресс чтения */
+.reading-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--tg-theme-secondary-bg-color);
+}
+
+.progress-bar {
+    height: 100%;
+    background: var(--tg-theme-button-color);
+    width: 0;
+    transition: width 0.2s;
+}
+
+/* Темная тема */
+.dark-theme {
+    background: #1a1a1a;
+    color: #ffffff;
+}
+
+.sepia-theme {
+    background: #f4ecd8;
+    color: #5b4636;
+}
+
+/* Адаптивные отступы */
+@media (max-width: 480px) {
+    .chapter-content {
+        padding: 16px 12px;
+        font-size: 16px;
+    }
+}
