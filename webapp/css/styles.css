@@ -1,14 +1,10 @@
-:root {
-    --tg-theme-bg-color: var(--tg-theme-bg-color, #ffffff);
-    --tg-theme-text-color: var(--tg-theme-text-color, #000000);
-    --tg-theme-hint-color: var(--tg-theme-hint-color, #999999);
-    --tg-theme-link-color: var(--tg-theme-link-color, #2481cc);
-    --tg-theme-button-color: var(--tg-theme-button-color, #2481cc);
-    --tg-theme-button-text-color: var(--tg-theme-button-text-color, #ffffff);
-    --tg-theme-secondary-bg-color: var(--tg-theme-secondary-bg-color, #f0f0f0);
-    
-    /* Кастомные цвета */
-    --card-border: rgba(0, 0, 0, 0.08);
+[data-theme="dark"] {
+    --tg-theme-bg-color: #1a1a1a;
+    --tg-theme-text-color: #ffffff;
+    --tg-theme-hint-color: #aaaaaa;
+    --tg-theme-link-color: #64b5f6;
+    --tg-theme-secondary-bg-color: #2d2d2d;
+    --card-border: rgba(255, 255, 255, 0.08);
 }
 
 * {
