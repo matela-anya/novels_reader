@@ -12,14 +12,6 @@
 
     /* Дополнительные переменные */
     --card-border: rgba(0, 0, 0, 0.08);
-    --content-padding: 16px;
-    --border-radius: 8px;
-    --transition-duration: 0.2s;
-}
-
-/* Темная тема */
-.dark {
-    --card-border: rgba(255, 255, 255, 0.08);
 }
 
 /* Базовые стили */
@@ -28,11 +20,10 @@
     padding: 0;
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
-    user-select: none; /* Запрещаем выделение текста */
+    user-select: none;
 }
 
-html {
-    width: 100%;
+html, body {
     height: 100%;
 }
 
@@ -42,17 +33,13 @@ body {
     color: var(--tg-theme-text-color);
     font-size: 16px;
     line-height: 1.4;
-    width: 100%;
-    height: 100%;
     overflow-x: hidden;
 }
 
 /* Контейнер приложения */
 .app-container {
-    max-width: 800px;
-    margin: 0 auto;
-    min-height: 100%;
-    padding: var(--content-padding);
+    height: 100%;
+    overflow-x: hidden;
 }
 
 /* Шапка */
@@ -61,47 +48,78 @@ body {
     top: 0;
     z-index: 100;
     background: var(--tg-theme-bg-color);
+    padding: 12px 16px;
     border-bottom: 1px solid var(--card-border);
-    margin: calc(-1 * var(--content-padding)) calc(-1 * var(--content-padding)) var(--content-padding);
 }
 
-.header-content {
-    padding: var(--content-padding);
-}
-
-.header-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.app-title {
+    font-size: 28px;
+    font-weight: 700;
     margin-bottom: 12px;
+}
+
+.become-translator {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 16px;
+    background: var(--tg-theme-button-color);
+    color: var(--tg-theme-button-text-color);
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-bottom: 12px;
+}
+
+/* Поиск */
+.search-container {
+    margin-bottom: 12px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 12px;
+    background: var(--tg-theme-secondary-bg-color);
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    color: var(--tg-theme-text-color);
+}
+
+.search-input::placeholder {
+    color: var(--tg-theme-hint-color);
 }
 
 /* Вкладки */
 .tabs {
     display: flex;
     gap: 8px;
-    padding: 8px var(--content-padding);
     overflow-x: auto;
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE and Edge */
-    background: var(--tg-theme-bg-color);
-    border-top: 1px solid var(--card-border);
+    padding-bottom: 8px;
+    margin: 0 -16px;
+    padding-left: 16px;
+    padding-right: 16px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }
 
 .tabs::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Opera */
+    display: none;
 }
 
 .tab-button {
+    flex-shrink: 0;
     padding: 8px 16px;
-    border-radius: var(--border-radius);
     background: var(--tg-theme-secondary-bg-color);
+    border: none;
+    border-radius: 8px;
     color: var(--tg-theme-hint-color);
     font-size: 14px;
     font-weight: 500;
-    border: none;
+    cursor: pointer;
     white-space: nowrap;
-    transition: all var(--transition-duration);
 }
 
 .tab-button.active {
@@ -109,10 +127,14 @@ body {
     color: var(--tg-theme-button-text-color);
 }
 
-/* Секции контента */
+/* Основной контент */
+.main-content {
+    padding: 16px;
+}
+
+/* Секции */
 .section {
     display: none;
-    padding-top: 16px;
 }
 
 .section.active {
@@ -126,214 +148,170 @@ body {
     margin-bottom: 16px;
 }
 
-.section-actions {
-    display: flex;
-    gap: 8px;
+.section-title {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+/* Кнопки сортировки и фильтров */
+.sort-button,
+.filter-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 12px;
+    background: var(--tg-theme-secondary-bg-color);
+    border: none;
+    border-radius: 8px;
+    color: var(--tg-theme-hint-color);
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.sort-icon,
+.filter-icon {
+    font-size: 16px;
 }
 
 /* Пустое состояние */
 .empty-state {
     text-align: center;
     padding: 32px 16px;
-    color: var(--tg-theme-hint-color);
 }
 
-.empty-state p {
+.empty-title {
     font-size: 16px;
+    font-weight: 500;
+    color: var(--tg-theme-text-color);
     margin-bottom: 8px;
 }
 
-.empty-state small {
+.empty-description {
     font-size: 14px;
+    color: var(--tg-theme-hint-color);
 }
 
-.empty-state.hidden {
+/* Модальное окно */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
     display: none;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 20px;
+    overflow-y: auto;
+    z-index: 1000;
 }
 
-/* Списки новелл и глав */
-.novels-list,
-.chapters-list {
+.modal-overlay.visible {
     display: flex;
-    flex-direction: column;
-    gap: 12px;
 }
 
-/* Карточка новеллы */
-.novel-card {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: var(--content-padding);
+.modal {
+    width: 100%;
+    max-width: 480px;
     background: var(--tg-theme-bg-color);
-    border: 1px solid var(--card-border);
-    border-radius: var(--border-radius);
-    text-decoration: none;
-    color: inherit;
-    transition: background-color var(--transition-duration);
+    border-radius: 12px;
+    overflow: hidden;
 }
 
-.novel-card:active {
-    background: var(--tg-theme-secondary-bg-color);
-}
-
-.novel-info {
-    flex: 1;
-    padding-right: 12px;
-}
-
-.novel-title {
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--tg-theme-text-color);
-    margin-bottom: 6px;
-}
-
-.novel-meta {
-    display: flex;
-    gap: 12px;
-    font-size: 14px;
-    color: var(--tg-theme-hint-color);
-}
-
-/* Карточка главы */
-.chapter-card {
-    background: var(--tg-theme-bg-color);
-    border: 1px solid var(--card-border);
-    border-radius: var(--border-radius);
-    padding: var(--content-padding);
-}
-
-.chapter-content {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.chapter-details {
+.modal-header {
+    padding: 16px;
+    border-bottom: 1px solid var(--card-border);
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.chapter-meta {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.chapter-title {
-    font-size: 16px;
+.modal-title {
+    font-size: 18px;
     font-weight: 600;
-    color: var(--tg-theme-text-color);
 }
 
-.novel-name {
-    font-size: 14px;
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
     color: var(--tg-theme-hint-color);
+    cursor: pointer;
+    padding: 4px;
 }
 
-.chapter-date {
-    font-size: 14px;
-    color: var(--tg-theme-hint-color);
+.modal-content {
+    padding: 16px;
 }
 
-/* Кнопки */
-.read-button {
-    padding: 8px 16px;
-    border-radius: var(--border-radius);
-    background: var(--tg-theme-button-color);
-    color: var(--tg-theme-button-text-color);
+/* Форма */
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
     font-size: 14px;
     font-weight: 500;
-    border: none;
-    cursor: pointer;
-    transition: opacity var(--transition-duration);
+    margin-bottom: 8px;
 }
 
-.read-button:active {
-    opacity: 0.8;
-}
-
-.filter-button,
-.sort-button {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    padding: 6px 12px;
-    border: none;
-    border-radius: var(--border-radius);
-    background: var(--tg-theme-secondary-bg-color);
-    color: var(--tg-theme-text-color);
-    font-size: 14px;
-    transition: all var(--transition-duration);
-}
-
-.filter-button.active {
-    background: var(--tg-theme-button-color);
-    color: var(--tg-theme-button-text-color);
-}
-
-/* Поиск */
-.search-bar {
-    position: relative;
-    margin-bottom: 12px;
-}
-
-.search-input {
+.form-input {
     width: 100%;
     padding: 12px;
-    border: 1px solid var(--card-border);
-    border-radius: var(--border-radius);
     background: var(--tg-theme-secondary-bg-color);
-    color: var(--tg-theme-text-color);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
     font-size: 16px;
-    transition: border-color var(--transition-duration);
+    color: var(--tg-theme-text-color);
 }
 
-.search-input::placeholder {
-    color: var(--tg-theme-hint-color);
-}
-
-.search-input:focus {
+.form-input:focus {
     outline: none;
     border-color: var(--tg-theme-button-color);
 }
 
-/* Иконки */
-.card-arrow {
-    flex-shrink: 0;
+.error-message {
+    display: none;
+    color: #ff3b30;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+.error-message.visible {
+    display: block;
+}
+
+.character-counter {
+    font-size: 12px;
     color: var(--tg-theme-hint-color);
+    text-align: right;
+    margin-top: 4px;
 }
 
-/* Анимации */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+/* Темная тема */
+:root[data-theme="dark"] {
+    --card-border: rgba(255, 255, 255, 0.08);
 }
 
-.section.active {
-    animation: fadeIn 0.3s ease;
-}
-
-/* Адаптивность */
+/* Отзывчивость */
 @media (max-width: 480px) {
-    :root {
-        --content-padding: 12px;
+    .app-header {
+        padding: 8px 12px;
     }
 
-    .novel-title {
-        font-size: 15px;
+    .main-content {
+        padding: 12px;
     }
 
-    .novel-meta,
-    .chapter-date {
-        font-size: 13px;
+    .modal-overlay {
+        padding: 0;
+    }
+
+    .modal {
+        height: 100%;
+        max-width: none;
+        border-radius: 0;
     }
 }
