@@ -1,75 +1,115 @@
-<div class="app-container">
-    <header class="app-header">
-        <div class="header-content">
-            <div class="header-top">
-                <h1 class="app-title">Novels Reader</h1>
-                <button class="become-translator">Стать переводчиком</button>
-            </div>
-            <div class="search-bar">
-                <input type="text" placeholder="Поиск новелл..." class="search-input">
-            </div>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Novels Reader</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <h1 class="app-title">Novels Reader</h1>
+            <button class="become-translator">Стать переводчиком</button>
             
-            <!-- Навигация по вкладкам -->
-            <div class="tabs">
-                <button class="tab-button active" data-tab="subscriptions">Подписки</button>
-                <button class="tab-button" data-tab="bookmarks">Закладки</button>
-                <button class="tab-button" data-tab="latest">Последние главы</button>
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="Поиск новелл...">
             </div>
-        </div>
-    </header>
 
-    <main class="main-content" role="main">
-        <!-- Секция подписок -->
-        <section class="section subscriptions active" data-section="subscriptions">
-            <div class="section-header">
-                <h2 class="section-title">Мои подписки</h2>
-                <div class="section-actions">
+            <div class="tabs">
+                <button class="tab-button active" data-section="subscriptions">Подписки</button>
+                <button class="tab-button" data-section="bookmarks">Закладки</button>
+                <button class="tab-button" data-section="latest">Последние главы</button>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <!-- Секция подписок -->
+            <section class="section subscriptions active" data-section="subscriptions">
+                <div class="section-header">
+                    <h2 class="section-title">Мои подписки</h2>
                     <button class="sort-button">
-                        <svg width="16" height="16" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M11 5h10M11 9h7M11 13h4M3 17h18M3 5l4 4-4 4"/>
-                        </svg>
+                        <span class="sort-icon">≡</span>
                         По обновлению
                     </button>
                 </div>
-            </div>
-            <div class="novels-list"></div>
-            <div class="empty-state subscriptions-empty hidden">
-                <p>У вас пока нет подписок</p>
-                <small>Подпишитесь на новеллы, чтобы следить за обновлениями</small>
-            </div>
-        </section>
+                <div class="novels-list">
+                    <!-- Сюда будут добавляться новеллы -->
+                </div>
+                <div class="empty-state subscriptions-empty">
+                    <p class="empty-title">У вас пока нет подписок</p>
+                    <p class="empty-description">Подпишитесь на новеллы, чтобы следить за обновлениями</p>
+                </div>
+            </section>
 
-        <!-- Секция закладок -->
-        <section class="section bookmarks" data-section="bookmarks">
-            <div class="section-header">
-                <h2 class="section-title">Мои закладки</h2>
-            </div>
-            <div class="novels-list"></div>
-            <div class="empty-state bookmarks-empty hidden">
-                <p>У вас пока нет закладок</p>
-                <small>Добавляйте новеллы в закладки, чтобы быстро находить их</small>
-            </div>
-        </section>
+            <!-- Секция закладок -->
+            <section class="section bookmarks" data-section="bookmarks">
+                <div class="section-header">
+                    <h2 class="section-title">Мои закладки</h2>
+                </div>
+                <div class="novels-list">
+                    <!-- Сюда будут добавляться закладки -->
+                </div>
+                <div class="empty-state bookmarks-empty">
+                    <p class="empty-title">У вас пока нет закладок</p>
+                    <p class="empty-description">Добавляйте новеллы в закладки, чтобы быстро находить их</p>
+                </div>
+            </section>
 
-        <!-- Секция последних глав -->
-        <section class="section latest-chapters" data-section="latest">
-            <div class="section-header">
-                <h2 class="section-title">Последние главы</h2>
-                <div class="section-actions">
+            <!-- Секция последних глав -->
+            <section class="section latest" data-section="latest">
+                <div class="section-header">
+                    <h2 class="section-title">Последние главы</h2>
                     <button class="filter-button">
-                        <svg width="16" height="16" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/>
-                        </svg>
+                        <span class="filter-icon">▾</span>
                         Только из подписок
                     </button>
                 </div>
-            </div>
-            <div class="chapters-list"></div>
-        </section>
-    </main>
-</div>
+                <div class="chapters-list">
+                    <!-- Сюда будут добавляться главы -->
+                </div>
+            </section>
+        </main>
+    </div>
 
-<!-- Модальное окно переводчика (оставляем как есть) -->
-<div class="modal-overlay" id="translatorModal">
-    <!-- ... содержимое модального окна ... -->
-</div>
+    <!-- Модальное окно для регистрации переводчика -->
+    <div class="modal-overlay" id="translatorModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Регистрация переводчика</h3>
+                <button class="modal-close">×</button>
+            </div>
+            <div class="modal-content">
+                <form id="translatorForm">
+                    <div class="form-group">
+                        <label>Имя переводчика *</label>
+                        <input type="text" name="translatorName" class="form-input" required minlength="2" maxlength="50" pattern="^[a-zA-Zа-яА-Я0-9\s\-]+$">
+                        <div class="error-message" data-error="translatorName"></div>
+                        <div class="character-counter"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>О себе *</label>
+                        <textarea name="description" class="form-input" required minlength="50" maxlength="500"></textarea>
+                        <div class="error-message" data-error="description"></div>
+                        <div class="character-counter"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Контакты</label>
+                        <div class="social-links">
+                            <div>
+                                <input type="text" name="telegram" class="form-input" placeholder="@username" pattern="^@?[\w\d]{5,32}$">
+                                <div class="error-message" data-error="telegram"></div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
