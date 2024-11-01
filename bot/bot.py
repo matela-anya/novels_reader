@@ -9,7 +9,7 @@ BOT_TOKEN = os.getenv('BOT_TOKEN')
 
 async def start(update, context):
     keyboard = ReplyKeyboardMarkup([
-        [KeyboardButton('Открыть читалку', web_app=WebAppInfo(url='https://novels-reader.vercel.app'))]
+        [KeyboardButton('Открыть читалку', web_app=WebAppInfo(url='https://novels-reader-beta.vercel.app'))]
     ], resize_keyboard=True)
     
     await update.message.reply_text(
