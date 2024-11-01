@@ -1,28 +1,28 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Novels Reader</title>
+    <!-- Подключаем Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="app-container">
-        <header class="app-header">
-            <h1 class="app-title">Novels Reader</h1>
-            <button class="become-translator">Стать переводчиком</button>
+        <div class="app-header">
+            <button class="button button-accent become-translator">Стать переводчиком</button>
             
             <div class="search-container">
                 <input type="text" class="search-input" placeholder="Поиск новелл...">
             </div>
 
-            <div class="tabs">
-                <button class="tab-button active" data-section="subscriptions">Подписки</button>
-                <button class="tab-button" data-section="bookmarks">Закладки</button>
-                <button class="tab-button" data-section="latest">Последние главы</button>
+            <div class="segment-control">
+                <button class="segment-button active" data-section="subscriptions">Подписки</button>
+                <button class="segment-button" data-section="bookmarks">Закладки</button>
+                <button class="segment-button" data-section="latest">Последние главы</button>
             </div>
-        </header>
+        </div>
 
         <main class="main-content">
             <!-- Секция подписок -->
@@ -34,10 +34,8 @@
                         По обновлению
                     </button>
                 </div>
-                <div class="novels-list">
-                    <!-- Сюда будут добавляться новеллы -->
-                </div>
-                <div class="empty-state subscriptions-empty">
+                <div class="novels-list"></div>
+                <div class="empty-state">
                     <p class="empty-title">У вас пока нет подписок</p>
                     <p class="empty-description">Подпишитесь на новеллы, чтобы следить за обновлениями</p>
                 </div>
@@ -48,10 +46,8 @@
                 <div class="section-header">
                     <h2 class="section-title">Мои закладки</h2>
                 </div>
-                <div class="novels-list">
-                    <!-- Сюда будут добавляться закладки -->
-                </div>
-                <div class="empty-state bookmarks-empty">
+                <div class="novels-list"></div>
+                <div class="empty-state">
                     <p class="empty-title">У вас пока нет закладок</p>
                     <p class="empty-description">Добавляйте новеллы в закладки, чтобы быстро находить их</p>
                 </div>
@@ -66,14 +62,12 @@
                         Только из подписок
                     </button>
                 </div>
-                <div class="chapters-list">
-                    <!-- Сюда будут добавляться главы -->
-                </div>
+                <div class="chapters-list"></div>
             </section>
         </main>
     </div>
 
-    <!-- Модальное окно для регистрации переводчика -->
+    <!-- Модальное окно -->
     <div class="modal-overlay" id="translatorModal">
         <div class="modal">
             <div class="modal-header">
@@ -84,7 +78,7 @@
                 <form id="translatorForm">
                     <div class="form-group">
                         <label>Имя переводчика *</label>
-                        <input type="text" name="translatorName" class="form-input" required minlength="2" maxlength="50" pattern="^[a-zA-Zа-яА-Я0-9\s\-]+$">
+                        <input type="text" name="translatorName" class="form-input" required minlength="2" maxlength="50">
                         <div class="error-message" data-error="translatorName"></div>
                         <div class="character-counter"></div>
                     </div>
@@ -97,13 +91,9 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Контакты</label>
-                        <div class="social-links">
-                            <div>
-                                <input type="text" name="telegram" class="form-input" placeholder="@username" pattern="^@?[\w\d]{5,32}$">
-                                <div class="error-message" data-error="telegram"></div>
-                            </div>
-                        </div>
+                        <label>Telegram</label>
+                        <input type="text" name="telegram" class="form-input" placeholder="@username" pattern="^@?[\w\d]{5,32}$">
+                        <div class="error-message" data-error="telegram"></div>
                     </div>
                 </form>
             </div>
