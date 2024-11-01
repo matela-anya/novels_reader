@@ -1,239 +1,362 @@
 // Получаем экземпляр WebApp
 const tg = window.Telegram.WebApp;
 
-// Функция для безопасной инициализации приложения
-function initializeApp() {
-    // Проверяем, что приложение запущено в Telegram
-    if (!tg) {
-        console.error('Telegram WebApp is not available');
-        return;
-    }
+// Состояние приложения
+const state = {
+    activeSection: 'subscriptions',
+    subscriptions: [],
+    bookmarks: [],
+    latestChapters: [],
+    showOnlySubscribed: false,
+    userSettings: null
+};
 
-    // Сообщаем WebApp что приложение готово
-    tg.ready();
-    // Раскрываем приложение на всю высоту
-    tg.expand();
-
-    // Инициализируем хранилище и получаем сохраненные настройки
-    initializeStorage().then(() => {
-        // После инициализации хранилища загружаем настройки
-        loadUserSettings();
-    });
-
-    // Настраиваем обработку темы
-    initializeTheme();
-}
-
-// Функция для работы с CloudStorage
-async function initializeStorage() {
-    try {
-        // Проверяем доступность CloudStorage
-        if (!tg.CloudStorage) {
-            console.warn('CloudStorage is not available');
+// Главный класс приложения
+const App = {
+    init() {
+        if (!tg) {
+            console.error('Telegram WebApp is not available');
             return;
         }
 
-        // Получаем список всех ключей
-        await new Promise((resolve) => {
-            tg.CloudStorage.getKeys((error, keys) => {
-                if (error) {
-                    console.error('Failed to get keys from CloudStorage:', error);
-                    resolve([]);
-                    return;
-                }
-                console.log('Available keys in CloudStorage:', keys);
-                resolve(keys);
+        // Инициализация WebApp
+        tg.ready();
+        tg.expand();
+
+        // Применяем тему
+        this.initTheme();
+        
+        // Инициализируем компоненты
+        UIManager.init();
+        DataManager.init();
+        ModalManager.init();
+    },
+
+    initTheme() {
+        document.documentElement.className = tg.colorScheme;
+        
+        // Слушаем изменения темы
+        tg.onEvent('themeChanged', () => {
+            document.documentElement.className = tg.colorScheme;
+        });
+    }
+};
+
+// Менеджер пользовательского интерфейса
+const UIManager = {
+    init() {
+        this.initTabs();
+        this.initSearch();
+        this.initButtons();
+    },
+
+    initTabs() {
+        const tabs = document.querySelectorAll('.tab-button');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Убираем активный класс у всех вкладок
+                tabs.forEach(t => t.classList.remove('active'));
+                // Добавляем активный класс текущей вкладке
+                tab.classList.add('active');
+
+                // Переключаем секции
+                const sectionId = tab.dataset.section;
+                this.switchSection(sectionId);
+
+                // Тактильный отклик
+                tg.HapticFeedback.selectionChanged();
             });
         });
-    } catch (error) {
-        console.error('Error initializing storage:', error);
-    }
-}
+    },
 
-// Функция для загрузки пользовательских настроек
-async function loadUserSettings() {
-    if (!tg.CloudStorage) return;
-
-    // Загружаем настройки из CloudStorage
-    tg.CloudStorage.getItem('userSettings', (error, value) => {
-        if (error) {
-            console.error('Failed to load settings:', error);
-            return;
-        }
-
-        if (value) {
-            try {
-                const settings = JSON.parse(value);
-                applyUserSettings(settings);
-            } catch (e) {
-                console.error('Failed to parse settings:', e);
-            }
-        }
-    });
-}
-
-// Функция для применения настроек
-function applyUserSettings(settings) {
-    const root = document.documentElement;
-    
-    // Применяем сохраненные настройки, если они есть
-    if (settings) {
-        if (settings.fontSize) {
-            root.style.setProperty('--base-font-size', settings.fontSize + 'px');
-        }
-        // Можно добавить другие настройки
-    }
-}
-
-// Функция для инициализации темы
-function initializeTheme() {
-    const root = document.documentElement;
-    
-    // Устанавливаем цветовую схему
-    root.classList.toggle('dark', tg.colorScheme === 'dark');
-
-    // Применяем цвета из WebApp
-    const colors = {
-        'bg-color': tg.backgroundColor,
-        'text-color': tg.textColor,
-        'hint-color': tg.themeParams?.hint_color,
-        'link-color': tg.themeParams?.link_color,
-        'button-color': tg.themeParams?.button_color,
-        'button-text-color': tg.themeParams?.button_text_color,
-        'secondary-bg-color': tg.themeParams?.secondary_bg_color
-    };
-
-    // Применяем цвета
-    Object.entries(colors).forEach(([key, value]) => {
-        if (value) {
-            root.style.setProperty(`--tg-theme-${key}`, value);
-        }
-    });
-
-    // Слушаем изменения темы
-    tg.onEvent('themeChanged', () => {
-        root.classList.toggle('dark', tg.colorScheme === 'dark');
-        // Обновляем цвета при изменении темы
-        Object.entries(colors).forEach(([key, value]) => {
-            if (value) {
-                root.style.setProperty(`--tg-theme-${key}`, value);
-            }
+    switchSection(sectionId) {
+        // Скрываем все секции
+        document.querySelectorAll('.section').forEach(section => {
+            section.classList.remove('active');
         });
-    });
-}
-
-// Функция для сохранения настроек
-function saveUserSettings(settings) {
-    if (!tg.CloudStorage) return;
-
-    const settingsString = JSON.stringify(settings);
-    tg.CloudStorage.setItem('userSettings', settingsString, (error) => {
-        if (error) {
-            console.error('Failed to save settings:', error);
-            return;
+        
+        // Показываем нужную секцию
+        const activeSection = document.querySelector(`.section[data-section="${sectionId}"]`);
+        if (activeSection) {
+            activeSection.classList.add('active');
+            state.activeSection = sectionId;
         }
-        console.log('Settings saved successfully');
-    });
-}
+    },
 
-// Инициализация модального окна переводчика
-function initModal() {
-    const modal = document.getElementById('translatorModal');
-    const openButton = document.querySelector('.become-translator');
-    const closeButton = document.querySelector('.modal-close');
-
-    if (openButton) {
-        openButton.addEventListener('click', () => {
-            modal.classList.add('visible');
-            document.body.style.overflow = 'hidden';
-            // Показываем главную кнопку Telegram
-            tg.MainButton.show();
-            tg.MainButton.setParams({
-                text: 'Стать переводчиком',
-                is_active: true,
-                text_color: tg.themeParams?.button_text_color,
-                color: tg.themeParams?.button_color,
+    initSearch() {
+        const searchInput = document.querySelector('.search-input');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                // Debounce поиска
+                clearTimeout(this.searchTimeout);
+                this.searchTimeout = setTimeout(() => {
+                    DataManager.handleSearch(e.target.value.trim());
+                }, 300);
             });
-        });
-    }
+        }
+    },
 
-    if (closeButton) {
-        closeButton.addEventListener('click', () => {
-            modal.classList.remove('visible');
-            document.body.style.overflow = '';
-            tg.MainButton.hide();
-        });
-    }
-
-    // Закрытие по клику на оверлей
-    if (modal) {
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                modal.classList.remove('visible');
-                document.body.style.overflow = '';
-                tg.MainButton.hide();
-            }
-        });
-    }
-
-    // Предотвращение закрытия WebApp при открытом модальном окне
-    tg.enableClosingConfirmation();
-}
-
-// Обработчик формы остается прежним, но теперь использует нативные попапы Telegram
-const FormHandler = {
-    // ... остальной код FormHandler остается тем же ...
-    
-    async submitForm(formData) {
-        try {
-            tg.MainButton.showProgress();
-            document.body.style.cursor = 'wait';
-            
-            // Имитация отправки на сервер
-            await new Promise(resolve => setTimeout(resolve, 2000));
-
-            // Очищаем сохраненные данные
-            localStorage.removeItem('translatorFormData');
-
-            // Закрываем модальное окно
-            const modal = document.getElementById('translatorModal');
-            modal.classList.remove('visible');
-            document.body.style.overflow = '';
-
-            // Используем нативный попап Telegram
-            tg.showPopup({
-                title: 'Успешно!',
-                message: 'Вы стали переводчиком',
-                buttons: [{type: 'ok'}]
+    initButtons() {
+        // Кнопка фильтра
+        const filterBtn = document.querySelector('.filter-button');
+        if (filterBtn) {
+            filterBtn.addEventListener('click', () => {
+                state.showOnlySubscribed = !state.showOnlySubscribed;
+                filterBtn.classList.toggle('active', state.showOnlySubscribed);
+                DataManager.renderLatestChapters();
+                tg.HapticFeedback.impactOccurred('light');
             });
+        }
 
-            // Закрываем WebApp
-            tg.close();
-        } catch (error) {
-            console.error('Error submitting form:', error);
-            tg.showPopup({
-                title: 'Ошибка',
-                message: 'Не удалось отправить форму. Попробуйте позже.',
-                buttons: [{type: 'ok'}]
+        // Кнопка сортировки
+        const sortBtn = document.querySelector('.sort-button');
+        if (sortBtn) {
+            sortBtn.addEventListener('click', () => {
+                tg.HapticFeedback.impactOccurred('light');
+                tg.showPopup({
+                    title: 'Сортировка',
+                    message: 'Выберите порядок сортировки:',
+                    buttons: [
+                        { id: 'update', type: 'default', text: 'По обновлению' },
+                        { id: 'name', type: 'default', text: 'По названию' },
+                        { id: 'close', type: 'cancel', text: 'Закрыть' }
+                    ]
+                }, (buttonId) => {
+                    if (buttonId !== 'close') {
+                        DataManager.sortNovels(buttonId);
+                    }
+                });
             });
-        } finally {
-            tg.MainButton.hideProgress();
-            document.body.style.cursor = '';
         }
     }
 };
 
-// Инициализация при загрузке страницы
-document.addEventListener('DOMContentLoaded', () => {
-    // Инициализируем приложение
-    initializeApp();
-    
-    // Инициализируем компоненты
-    initModal();
-    // Остальные инициализации...
-});
+// Менеджер данных
+const DataManager = {
+    async init() {
+        await this.loadData();
+        this.renderContent();
+    },
 
-// Предотвращение открытия контекстного меню
-document.addEventListener('contextmenu', (e) => {
-    e.preventDefault();
+    async loadData() {
+        if (!tg.CloudStorage) return;
+
+        try {
+            // Загружаем подписки
+            const subscriptions = await this.loadFromStorage('subscriptions');
+            if (subscriptions) state.subscriptions = JSON.parse(subscriptions);
+
+            // Загружаем закладки
+            const bookmarks = await this.loadFromStorage('bookmarks');
+            if (bookmarks) state.bookmarks = JSON.parse(bookmarks);
+
+            // Загружаем последние главы (пример данных)
+            state.latestChapters = [
+                {
+                    id: 1,
+                    title: 'Глава 156: Начало конца',
+                    novelTitle: 'Возрождение после смерти',
+                    date: 'Сегодня'
+                }
+                // Добавьте больше глав здесь
+            ];
+        } catch (error) {
+            console.error('Error loading data:', error);
+            // Показываем ошибку пользователю
+            tg.showPopup({
+                title: 'Ошибка',
+                message: 'Не удалось загрузить данные. Попробуйте позже.',
+                buttons: [{ type: 'ok' }]
+            });
+        }
+    },
+
+    async loadFromStorage(key) {
+        return new Promise((resolve) => {
+            tg.CloudStorage.getItem(key, (error, value) => {
+                if (error) {
+                    console.error(`Error loading ${key}:`, error);
+                    resolve(null);
+                } else {
+                    resolve(value);
+                }
+            });
+        });
+    },
+
+    renderContent() {
+        this.renderSubscriptions();
+        this.renderBookmarks();
+        this.renderLatestChapters();
+    },
+
+    renderSubscriptions() {
+        const container = document.querySelector('.subscriptions .novels-list');
+        const emptyState = document.querySelector('.subscriptions .empty-state');
+        
+        if (!state.subscriptions.length) {
+            container.innerHTML = '';
+            emptyState.style.display = 'block';
+            return;
+        }
+
+        emptyState.style.display = 'none';
+        container.innerHTML = this.generateNovelsList(state.subscriptions);
+    },
+
+    renderBookmarks() {
+        const container = document.querySelector('.bookmarks .novels-list');
+        const emptyState = document.querySelector('.bookmarks .empty-state');
+        
+        if (!state.bookmarks.length) {
+            container.innerHTML = '';
+            emptyState.style.display = 'block';
+            return;
+        }
+
+        emptyState.style.display = 'none';
+        container.innerHTML = this.generateNovelsList(state.bookmarks);
+    },
+
+    renderLatestChapters() {
+        const container = document.querySelector('.chapters-list');
+        let chapters = [...state.latestChapters];
+
+        if (state.showOnlySubscribed) {
+            chapters = chapters.filter(chapter => 
+                state.subscriptions.some(sub => sub.id === chapter.novelId)
+            );
+        }
+
+        container.innerHTML = chapters.map(chapter => `
+            <div class="chapter-card">
+                <h3 class="chapter-title">${chapter.title}</h3>
+                <div class="chapter-info">
+                    <span class="novel-title">${chapter.novelTitle}</span>
+                    <span class="chapter-date">${chapter.date}</span>
+                </div>
+                <button class="read-button" onclick="DataManager.openChapter(${chapter.id})">
+                    Читать
+                </button>
+            </div>
+        `).join('');
+    },
+
+    generateNovelsList(novels) {
+        return novels.map(novel => `
+            <div class="novel-card" onclick="DataManager.openNovel(${novel.id})">
+                <div class="novel-info">
+                    <h3 class="novel-title">${novel.title}</h3>
+                    <div class="novel-meta">
+                        <span class="translator">${novel.translator}</span>
+                        <span class="chapters-count">${novel.chaptersCount} глав</span>
+                    </div>
+                </div>
+                <div class="novel-arrow">→</div>
+            </div>
+        `).join('');
+    },
+
+    openNovel(id) {
+        window.location.href = `novel.html?id=${id}`;
+    },
+
+    openChapter(id) {
+        window.location.href = `chapter.html?id=${id}`;
+    },
+
+    handleSearch(query) {
+        // Здесь будет логика поиска
+        console.log('Searching for:', query);
+    },
+
+    sortNovels(method) {
+        // Здесь будет логика сортировки
+        console.log('Sorting by:', method);
+    }
+};
+
+// Менеджер модальных окон
+const ModalManager = {
+    init() {
+        this.initTranslatorModal();
+    },
+
+    initTranslatorModal() {
+        const modal = document.getElementById('translatorModal');
+        const openBtn = document.querySelector('.become-translator');
+        const closeBtn = document.querySelector('.modal-close');
+        const form = document.getElementById('translatorForm');
+
+        if (openBtn) {
+            openBtn.addEventListener('click', () => {
+                modal.classList.add('visible');
+                tg.MainButton.show();
+                tg.MainButton.setParams({
+                    text: 'Стать переводчиком',
+                    is_active: true
+                });
+            });
+        }
+
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                modal.classList.remove('visible');
+                tg.MainButton.hide();
+            });
+        }
+
+        if (form) {
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.handleTranslatorForm(form);
+            });
+        }
+
+        // Закрытие по клику вне модального окна
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('visible');
+                tg.MainButton.hide();
+            }
+        });
+
+        // Обработка главной кнопки
+        tg.MainButton.onClick(() => {
+            if (form) form.dispatchEvent(new Event('submit'));
+        });
+    },
+
+    async handleTranslatorForm(form) {
+        const formData = new FormData(form);
+        try {
+            tg.MainButton.showProgress();
+            
+            // Здесь будет отправка данных на сервер
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            tg.showPopup({
+                title: 'Успешно!',
+                message: 'Вы стали переводчиком',
+                buttons: [{ type: 'ok' }]
+            });
+
+            document.getElementById('translatorModal').classList.remove('visible');
+            tg.MainButton.hide();
+        } catch (error) {
+            tg.showPopup({
+                title: 'Ошибка',
+                message: 'Не удалось отправить форму. Попробуйте позже.',
+                buttons: [{ type: 'ok' }]
+            });
+        } finally {
+            tg.MainButton.hideProgress();
+        }
+    }
+};
+
+// Инициализация приложения при загрузке
+document.addEventListener('DOMContentLoaded', () => {
+    App.init();
 });
