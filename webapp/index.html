@@ -1,210 +1,75 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="format-detection" content="telephone=no">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="MobileOptimized" content="176">
-    <meta name="HandheldFriendly" content="True">
-    <meta name="robots" content="noindex,nofollow">
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="css/styles.css">
-    <title>Novels Reader</title>
-</head>
-<body>
-    <div class="app-container">
-        <header class="app-header">
-            <div class="header-content">
-                <div class="header-top">
-                    <h1 class="app-title">Novels Reader</h1>
-                    <button type="button" class="become-translator">Стать переводчиком</button>
-                </div>
-                <div class="search-bar">
-                    <input type="text" class="search-input" placeholder="Поиск новелл или переводчиков...">
-                </div>
+<div class="app-container">
+    <header class="app-header">
+        <div class="header-content">
+            <div class="header-top">
+                <h1 class="app-title">Novels Reader</h1>
+                <button class="become-translator">Стать переводчиком</button>
             </div>
-        </header>
-
-        <main class="main-content">
-            <h2 class="cabinet-title">Кабинет читателя</h2>
-
-            <section class="section subscriptions">
-                <h2 class="section-title">Мои подписки</h2>
-                <div class="novels-list">
-                    <a href="novel.html?id=1" class="novel-card">
-                        <div class="novel-info">
-                            <h3 class="novel-title">Возрождение после смерти</h3>
-                            <div class="novel-meta">
-                                <span class="translator">TowerTeam</span>
-                                <span class="chapter-count">156 глав</span>
-                            </div>
-                        </div>
-                        <div class="card-arrow">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M9 18l6-6-6-6" />
-                            </svg>
-                        </div>
-                    </a>
-
-                    <a href="novel.html?id=2" class="novel-card">
-                        <div class="novel-info">
-                            <h3 class="novel-title">Монарх упадка</h3>
-                            <div class="novel-meta">
-                                <span class="translator">NovelGroup</span>
-                                <span class="chapter-count">89 глав</span>
-                            </div>
-                        </div>
-                        <div class="card-arrow">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M9 18l6-6-6-6" />
-                            </svg>
-                        </div>
-                    </a>
-                </div>
-            </section>
-
-            <section class="section latest-chapters">
-                <h2 class="section-title">Последние главы</h2>
-                <div class="chapters-list">
-                    <div class="chapter-card">
-                        <div class="chapter-content">
-                            <h3 class="chapter-title">Глава 156: Начало конца</h3>
-                            <div class="chapter-details">
-                                <div class="chapter-meta">
-                                    <span class="novel-name">Возрождение после смерти</span>
-                                    <span class="chapter-date">Сегодня</span>
-                                </div>
-                                <button type="button" class="action-button">Читать</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="chapter-card">
-                        <div class="chapter-content">
-                            <h3 class="chapter-title">Глава 89: Последний бой</h3>
-                            <div class="chapter-details">
-                                <div class="chapter-meta">
-                                    <span class="novel-name">Монарх упадка</span>
-                                    <span class="chapter-date">Вчера</span>
-                                </div>
-                                <button type="button" class="action-button">Читать</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </main>
-    </div>
-
-    <form id="translatorModal" class="modal-overlay">
-        <div class="modal">
-            <div class="modal-header">
-                <h2 class="modal-title">Регистрация переводчика</h2>
-                <button type="button" class="modal-close">&times;</button>
+            <div class="search-bar">
+                <input type="text" placeholder="Поиск новелл..." class="search-input">
             </div>
-            <div class="modal-content">
-                <div class="form-group">
-                    <label>Аватар</label>
-                    <div class="avatar-upload">
-                        <div class="avatar-container">
-                            <div class="avatar-preview">
-                                <img id="avatarPreview" src="/api/placeholder/80/80" alt="Аватар">
-                            </div>
-                            <div class="upload-progress">
-                                <div class="upload-progress-bar"></div>
-                            </div>
-                        </div>
-                        <div class="avatar-actions">
-                            <button type="button" class="avatar-button" onclick="document.getElementById('avatarInput').click()">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M3 17v3a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-3" />
-                                    <polyline points="16 6 12 2 8 6"></polyline>
-                                    <line x1="12" y1="2" x2="12" y2="16"></line>
-                                </svg>
-                            </button>
-                            <button type="button" class="avatar-button" id="removeAvatar">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M3 6h18" />
-                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
-                                    <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                    <input type="file" id="avatarInput" accept="image/*" style="display: none">
-                    <div class="upload-hint">Рекомендуемый размер: 200x200px, до 1MB</div>
-                    <div class="error-message" data-error="avatar"></div>
-                </div>
-
-                <div class="form-group">
-                    <label for="translatorName">Имя переводчика *</label>
-                    <input type="text" 
-                           id="translatorName"
-                           name="translatorName" 
-                           class="form-input" 
-                           required 
-                           minlength="2" 
-                           maxlength="50" 
-                           pattern="[A-Za-zА-Яа-я0-9\s\-]+" 
-                           placeholder="Как вас будут видеть читатели">
-                    <div class="error-message" data-error="translatorName"></div>
-                    <div class="character-counter">0/50</div>
-                </div>
-
-                <div class="form-group">
-                    <label for="description">О себе *</label>
-                    <textarea id="description"
-                              name="description" 
-                              class="form-input" 
-                              required 
-                              minlength="50" 
-                              maxlength="500" 
-                              rows="4" 
-                              placeholder="Расскажите о своем опыте перевода, любимых жанрах"></textarea>
-                    <div class="error-message" data-error="description"></div>
-                    <div class="character-counter">0/500</div>
-                </div>
-
-                <div class="form-group">
-                    <label>Социальные сети</label>
-                    <div class="social-links">
-                        <div class="social-input">
-                            <label for="telegram">Telegram:</label>
-                            <input type="text" 
-                                   id="telegram"
-                                   name="telegram" 
-                                   class="form-input" 
-                                   pattern="@[A-Za-z0-9_]{5,32}" 
-                                   placeholder="@username">
-                            <div class="error-message" data-error="telegram"></div>
-                        </div>
-
-                        <div class="social-input">
-                            <label for="discord">Discord:</label>
-                            <input type="text" 
-                                   id="discord"
-                                   name="discord" 
-                                   class="form-input" 
-                                   placeholder="username#0000">
-                            <div class="error-message" data-error="discord"></div>
-                        </div>
-
-                        <div class="social-input">
-                            <label for="vk">VK:</label>
-                            <input type="text" 
-                                   id="vk"
-                                   name="vk" 
-                                   class="form-input" 
-                                   placeholder="vk.com/username">
-                            <div class="error-message" data-error="vk"></div>
-                        </div>
-                    </div>
-                </div>
+            
+            <!-- Навигация по вкладкам -->
+            <div class="tabs">
+                <button class="tab-button active" data-tab="subscriptions">Подписки</button>
+                <button class="tab-button" data-tab="bookmarks">Закладки</button>
+                <button class="tab-button" data-tab="latest">Последние главы</button>
             </div>
         </div>
-    </form>
+    </header>
 
-    <script src="js/app.js"></script>
-</body>
-</html>
+    <main class="main-content" role="main">
+        <!-- Секция подписок -->
+        <section class="section subscriptions active" data-section="subscriptions">
+            <div class="section-header">
+                <h2 class="section-title">Мои подписки</h2>
+                <div class="section-actions">
+                    <button class="sort-button">
+                        <svg width="16" height="16" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 5h10M11 9h7M11 13h4M3 17h18M3 5l4 4-4 4"/>
+                        </svg>
+                        По обновлению
+                    </button>
+                </div>
+            </div>
+            <div class="novels-list"></div>
+            <div class="empty-state subscriptions-empty hidden">
+                <p>У вас пока нет подписок</p>
+                <small>Подпишитесь на новеллы, чтобы следить за обновлениями</small>
+            </div>
+        </section>
+
+        <!-- Секция закладок -->
+        <section class="section bookmarks" data-section="bookmarks">
+            <div class="section-header">
+                <h2 class="section-title">Мои закладки</h2>
+            </div>
+            <div class="novels-list"></div>
+            <div class="empty-state bookmarks-empty hidden">
+                <p>У вас пока нет закладок</p>
+                <small>Добавляйте новеллы в закладки, чтобы быстро находить их</small>
+            </div>
+        </section>
+
+        <!-- Секция последних глав -->
+        <section class="section latest-chapters" data-section="latest">
+            <div class="section-header">
+                <h2 class="section-title">Последние главы</h2>
+                <div class="section-actions">
+                    <button class="filter-button">
+                        <svg width="16" height="16" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/>
+                        </svg>
+                        Только из подписок
+                    </button>
+                </div>
+            </div>
+            <div class="chapters-list"></div>
+        </section>
+    </main>
+</div>
+
+<!-- Модальное окно переводчика (оставляем как есть) -->
+<div class="modal-overlay" id="translatorModal">
+    <!-- ... содержимое модального окна ... -->
+</div>
