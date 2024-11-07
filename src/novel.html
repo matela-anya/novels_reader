@@ -1,1 +1,124 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="format-detection" content="telephone=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="MobileOptimized" content="176">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Чтение новеллы</title>
 
+    <!-- Telegram WebApp -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <!-- Стили -->
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="/static/css/novel.css">
+
+    <!-- Скрипты -->
+    <script type="module" src="/static/js/api.js"></script>
+    <script type="module" src="/static/js/storage.js"></script>
+    <script type="module" src="/static/js/novel.js"></script>
+</head>
+<body>
+    <div class="app-container novel-page">
+        <!-- Шапка новеллы -->
+        <section class="novel-header">
+            <div class="novel-cover">
+                <img src="/static/images/placeholder.png" alt="Обложка новеллы" class="novel-cover-image">
+            </div>
+
+            <div class="novel-header-content">
+                <h1 class="novel-title"></h1>
+
+                <!-- Статистика -->
+                <div class="novel-stats">
+                    <span class="stat views" data-icon="👁">0 просмотров</span>
+                    <span class="stat subscribers" data-icon="👥">0 подписчиков</span>
+                    <span class="stat chapters" data-icon="📖">0 глав</span>
+                </div>
+
+                <!-- Действия -->
+                <div class="novel-actions">
+                    <button class="action-button primary subscribe-button" data-haptic="medium">
+                        Подписаться
+                    </button>
+                    <button class="action-button bookmark-button" data-haptic="light">
+                        <span class="icon">🔖</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Основной контент -->
+        <div class="novel-content">
+            <!-- Информация о переводчике -->
+            <section class="translator-info">
+                <a href="#" class="translator-link" data-haptic="light">
+                    <div class="translator-avatar">
+                        <img src="/static/images/avatar.png" alt="Аватар">
+                    </div>
+                    <div class="translator-details">
+                        <div class="translator-name"></div>
+                        <div class="translator-stats"></div>
+                    </div>
+                </a>
+            </section>
+
+            <!-- Описание новеллы -->
+            <section class="novel-description">
+                <h2 class="section-title">О новелле</h2>
+                <div class="description-text"></div>
+                <div class="novel-tags"></div>
+            </section>
+
+            <!-- Список глав -->
+            <section class="chapters-section">
+                <div class="section-header">
+                    <h2 class="section-title">Главы</h2>
+                    <div class="section-actions">
+                        <button class="sort-button" data-haptic="light">
+                            <span class="icon">🔄</span>
+                            <span class="sort-text">По номеру</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="chapters-list">
+                    <!-- Главы будут добавлены через JavaScript -->
+                </div>
+
+                <button class="load-more" style="display: none;" data-haptic="light">
+                    Загрузить еще
+                </button>
+
+                <div class="empty-state" style="display: none;">
+                    <h3 class="empty-title">Нет глав</h3>
+                    <p>Главы этой новеллы пока не опубликованы</p>
+                </div>
+            </section>
+        </div>
+
+        <!-- Нижняя панель для переводчика -->
+        <footer class="translator-panel" style="display: none;">
+            <button class="button button-primary add-chapter-button" data-haptic="medium">
+                <span class="icon">📝</span>
+                Добавить главу
+            </button>
+        </footer>
+    </div>
+
+    <!-- Шаблон для главы -->
+    <template id="chapter-card-template">
+        <div class="chapter-card" data-haptic="light">
+            <h3 class="chapter-title"></h3>
+            <div class="chapter-meta">
+                <span class="chapter-number"></span>
+                <span class="chapter-date"></span>
+            </div>
+        </div>
+    </template>
+</body>
+</html>
