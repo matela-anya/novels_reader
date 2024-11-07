@@ -1,1 +1,142 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="format-detection" content="telephone=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="MobileOptimized" content="176">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Novel Reader</title>
+    
+    <!-- Telegram WebApp -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <!-- Стили -->
+    <link rel="stylesheet" href="/static/css/styles.css">
+    
+    <!-- Скрипты -->
+    <script type="module" src="/static/js/api.js"></script>
+    <script type="module" src="/static/js/storage.js"></script>
+    <script type="module" src="/static/js/app.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Шапка приложения -->
+        <header class="app-header">
+            <h1 class="app-title">Novel Reader</h1>
 
+            <!-- Кнопка для переводчика -->
+            <button class="button button-primary become-translator" data-role="become-translator">
+                Стать переводчиком
+            </button>
+
+            <!-- Поиск -->
+            <div class="search-container">
+                <input type="search" class="search-input" placeholder="Поиск новелл...">
+            </div>
+
+            <!-- Табы -->
+            <div class="tabs">
+                <button class="tab-button active" data-section="subscriptions" data-haptic="selection">
+                    <span class="tab-icon">📚</span> Подписки
+                </button>
+                <button class="tab-button" data-section="bookmarks" data-haptic="selection">
+                    <span class="tab-icon">🔖</span> Закладки
+                </button>
+                <button class="tab-button" data-section="latest" data-haptic="selection">
+                    <span class="tab-icon">🆕</span> Новые главы
+                </button>
+            </div>
+        </header>
+
+        <!-- Основной контент -->
+        <main class="main-content" role="main">
+            <!-- Секция подписок -->
+            <section class="section active" data-section="subscriptions">
+                <div class="section-header">
+                    <h2 class="section-title">Подписки</h2>
+                </div>
+                <div class="novels-list">
+                    <!-- Контент будет добавлен через JavaScript -->
+                </div>
+                <div class="empty-state">
+                    <h3 class="empty-title">Нет подписок</h3>
+                    <p>Найдите интересные новеллы и подпишитесь на их обновления</p>
+                </div>
+            </section>
+
+            <!-- Секция закладок -->
+            <section class="section" data-section="bookmarks">
+                <div class="section-header">
+                    <h2 class="section-title">Закладки</h2>
+                </div>
+                <div class="novels-list">
+                    <!-- Контент будет добавлен через JavaScript -->
+                </div>
+                <div class="empty-state">
+                    <h3 class="empty-title">Нет закладок</h3>
+                    <p>Добавляйте новеллы в закладки, чтобы не потерять их</p>
+                </div>
+            </section>
+
+            <!-- Секция новых глав -->
+            <section class="section" data-section="latest">
+                <div class="section-header">
+                    <h2 class="section-title">Новые главы</h2>
+                    <div class="section-actions">
+                        <button class="filter-button" data-haptic="light">
+                            <span class="icon">📊</span>
+                            Фильтры
+                        </button>
+                        <button class="sort-button" data-haptic="light">
+                            <span class="icon">🔄</span>
+                            Сортировка
+                        </button>
+                    </div>
+                </div>
+                <div class="chapters-list">
+                    <!-- Контент будет добавлен через JavaScript -->
+                </div>
+            </section>
+
+            <!-- Загрузка -->
+            <div class="loading-indicator" style="display: none;">
+                Загрузка...
+            </div>
+        </main>
+
+        <!-- Нижняя панель -->
+        <footer class="app-footer" style="display: none;">
+            <!-- Будет показана для определенных действий -->
+        </footer>
+    </div>
+
+    <!-- Шаблоны для JavaScript -->
+    <template id="novel-card-template">
+        <div class="novel-card" data-haptic="light">
+            <div class="novel-cover">
+                <img src="" alt="">
+            </div>
+            <div class="novel-info">
+                <h3 class="novel-title"></h3>
+                <div class="novel-meta">
+                    <span class="translator"></span>
+                    <span class="update-time"></span>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="chapter-card-template">
+        <div class="chapter-card" data-haptic="light">
+            <h3 class="chapter-title"></h3>
+            <div class="chapter-meta">
+                <span class="novel-title"></span>
+                <span class="publish-time"></span>
+            </div>
+        </div>
+    </template>
+</body>
+</html>
