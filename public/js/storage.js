@@ -3,12 +3,13 @@
  */
 class TelegramStorage {
     constructor() {
+        // Проверяем доступность Telegram WebApp и CloudStorage
         this.telegram = window.Telegram?.WebApp;
         if (!this.telegram?.CloudStorage) {
             throw new Error('Telegram CloudStorage is not available');
         }
 
-        // Ключи для хранения
+        // Ключи для хранения данных
         this.keys = {
             USER_ROLE: 'user_role',
             READING_SETTINGS: 'reading_settings',
@@ -21,9 +22,12 @@ class TelegramStorage {
         // Кеш для оптимизации
         this.cache = new Map();
         this.cacheTimeout = 5 * 60 * 1000; // 5 минут
+        this.maxCacheItems = 100; // Максимальное количество элементов в кеше
     }
 
-    // Базовые методы для работы с CloudStorage
+    /**
+     * Базовые методы для работы с CloudStorage
+     */
     async getItem(key) {
         // Проверяем кеш
         const cached = this.cache.get(key);
@@ -39,10 +43,7 @@ class TelegramStorage {
                     try {
                         const parsed = value ? JSON.parse(value) : null;
                         // Сохраняем в кеш
-                        this.cache.set(key, {
-                            value: parsed,
-                            timestamp: Date.now()
-                        });
+                        this._setCacheItem(key, parsed);
                         resolve(parsed);
                     } catch (e) {
                         reject(e);
@@ -54,10 +55,7 @@ class TelegramStorage {
 
     async setItem(key, value) {
         // Обновляем кеш
-        this.cache.set(key, {
-            value,
-            timestamp: Date.now()
-        });
+        this._setCacheItem(key, value);
 
         return new Promise((resolve, reject) => {
             this.telegram.CloudStorage.setItem(
@@ -83,7 +81,9 @@ class TelegramStorage {
         });
     }
 
-    // Методы для работы с ролью пользователя
+    /**
+     * Методы для работы с ролью пользователя
+     */
     async getUserRole() {
         const role = await this.getItem(this.keys.USER_ROLE);
         return role || 'reader';
@@ -96,7 +96,9 @@ class TelegramStorage {
         return this.setItem(this.keys.USER_ROLE, role);
     }
 
-    // Методы для работы с настройками чтения
+    /**
+     * Методы для работы с настройками чтения
+     */
     async getReadingSettings() {
         const settings = await this.getItem(this.keys.READING_SETTINGS);
         return {
@@ -110,7 +112,9 @@ class TelegramStorage {
         return this.setItem(this.keys.READING_SETTINGS, settings);
     }
 
-    // Методы для работы с подписками
+    /**
+     * Методы для работы с подписками
+     */
     async getSubscriptions() {
         const subs = await this.getItem(this.keys.SUBSCRIPTIONS);
         return subs || [];
@@ -131,7 +135,9 @@ class TelegramStorage {
         return this.setItem(this.keys.SUBSCRIPTIONS, newSubs);
     }
 
-    // Методы для работы с закладками
+    /**
+     * Методы для работы с закладками
+     */
     async getBookmarks() {
         const bookmarks = await this.getItem(this.keys.BOOKMARKS);
         return bookmarks || [];
@@ -152,7 +158,9 @@ class TelegramStorage {
         return this.setItem(this.keys.BOOKMARKS, newBookmarks);
     }
 
-    // Методы для работы с прогрессом чтения
+    /**
+     * Методы для работы с прогрессом чтения
+     */
     async getReadingProgress(novelId) {
         const progress = await this.getItem(this.keys.READING_PROGRESS);
         return progress?.[novelId] || null;
@@ -168,7 +176,9 @@ class TelegramStorage {
         return this.setItem(this.keys.READING_PROGRESS, progress);
     }
 
-    // Методы для работы с историей чтения
+    /**
+     * Методы для работы с историей чтения
+     */
     async getLastRead() {
         const lastRead = await this.getItem(this.keys.LAST_READ);
         return lastRead || [];
@@ -188,13 +198,59 @@ class TelegramStorage {
         return this.setItem(this.keys.LAST_READ, newLastRead);
     }
 
-    // Очистка данных
-    async clearAll() {
-        for (const key of Object.values(this.keys)) {
-            await this.removeItem(key);
+    /**
+     * Управление кешем
+     */
+    _setCacheItem(key, value) {
+        // Очищаем кеш если превышен лимит
+        if (this.cache.size >= this.maxCacheItems) {
+            const oldestKey = this.cache.keys().next().value;
+            this.cache.delete(oldestKey);
         }
-        this.cache.clear();
-        return true;
+
+        this.cache.set(key, {
+            value,
+            timestamp: Date.now()
+        });
+    }
+
+    /**
+     * Очистка данных
+     */
+    async clearAll() {
+        try {
+            for (const key of Object.values(this.keys)) {
+                await this.removeItem(key);
+            }
+            this.cache.clear();
+            return true;
+        } catch (error) {
+            console.error('Error clearing storage:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Синхронизация данных
+     */
+    async sync() {
+        try {
+            // Очищаем кеш
+            this.cache.clear();
+            
+            // Перезагружаем все данные
+            await Promise.all([
+                this.getReadingSettings(),
+                this.getSubscriptions(),
+                this.getBookmarks(),
+                this.getLastRead()
+            ]);
+
+            return true;
+        } catch (error) {
+            console.error('Error syncing data:', error);
+            throw error;
+        }
     }
 }
 
