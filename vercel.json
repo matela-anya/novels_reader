@@ -1,1 +1,38 @@
-
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/main.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "src/**/*.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "public/**/*",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "api/main.py"
+    },
+    {
+      "src": "/static/(.*)",
+      "dest": "public/$1"
+    },
+    {
+      "src": "/(.*)\\.html",
+      "dest": "src/$1.html"
+    },
+    {
+      "src": "/",
+      "dest": "src/index.html"
+    }
+  ],
+  "env": {
+    "POSTGRES_URL": "@postgres_url"
+  }
+}
