@@ -1,1 +1,377 @@
+/* Страница новеллы */
+.novel-page {
+    min-height: 100vh;
+    padding-bottom: env(safe-area-inset-bottom, 16px);
+    background: var(--tg-theme-bg-color);
+}
 
+/* Шапка с обложкой */
+.novel-header {
+    position: relative;
+    background: var(--tg-theme-secondary-bg-color);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+@media (min-width: 768px) {
+    .novel-header {
+        flex-direction: row;
+        align-items: flex-start;
+    }
+}
+
+/* Обложка */
+.novel-cover {
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+    aspect-ratio: 2/3;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.novel-cover-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Информация о новелле */
+.novel-header-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.novel-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--tg-theme-text-color);
+    margin: 0;
+}
+
+/* Статистика */
+.novel-stats {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.stat {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    color: var(--tg-theme-hint-color);
+}
+
+.stat::before {
+    content: attr(data-icon);
+    font-size: 16px;
+}
+
+/* Кнопки действий */
+.novel-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: auto;
+}
+
+.action-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 16px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.action-button:active {
+    opacity: 0.7;
+}
+
+.action-button.primary {
+    flex: 1;
+    background: var(--tg-theme-button-color);
+    color: var(--tg-theme-button-text-color);
+}
+
+.action-button.primary.subscribed {
+    background: var(--tg-theme-secondary-bg-color);
+    color: var(--tg-theme-text-color);
+}
+
+.bookmark-button {
+    padding: 12px;
+    background: var(--tg-theme-secondary-bg-color);
+    color: var(--tg-theme-text-color);
+}
+
+.bookmark-button.active {
+    color: var(--tg-theme-button-color);
+}
+
+/* Основной контент */
+.novel-content {
+    padding: 16px;
+}
+
+/* Переводчик */
+.translator-info {
+    margin-bottom: 24px;
+}
+
+.translator-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: inherit;
+    padding: 12px;
+    background: var(--tg-theme-secondary-bg-color);
+    border-radius: 12px;
+    transition: opacity 0.2s;
+}
+
+.translator-link:active {
+    opacity: 0.7;
+}
+
+.translator-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.translator-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.translator-details {
+    flex: 1;
+}
+
+.translator-name {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: var(--tg-theme-text-color);
+}
+
+.translator-stats {
+    font-size: 14px;
+    color: var(--tg-theme-hint-color);
+}
+
+/* Описание */
+.novel-description {
+    margin-bottom: 24px;
+}
+
+.section-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0 0 12px 0;
+    color: var(--tg-theme-text-color);
+}
+
+.description-text {
+    font-size: 15px;
+    line-height: 1.5;
+    margin-bottom: 12px;
+    color: var(--tg-theme-text-color);
+}
+
+/* Теги */
+.novel-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.tag {
+    padding: 6px 12px;
+    background: var(--tg-theme-secondary-bg-color);
+    border-radius: 16px;
+    font-size: 14px;
+    color: var(--tg-theme-hint-color);
+}
+
+/* Секция глав */
+.chapters-section {
+    margin-bottom: 24px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.section-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.sort-button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 8px;
+    background: var(--tg-theme-secondary-bg-color);
+    color: var(--tg-theme-text-color);
+    font-size: 14px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.sort-button:active {
+    opacity: 0.7;
+}
+
+/* Список глав */
+.chapters-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.chapter-card {
+    padding: 16px;
+    background: var(--tg-theme-secondary-bg-color);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.chapter-card:active {
+    opacity: 0.7;
+}
+
+.chapter-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+    color: var(--tg-theme-text-color);
+}
+
+.chapter-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: var(--tg-theme-hint-color);
+}
+
+/* Кнопка загрузки */
+.load-more {
+    width: 100%;
+    padding: 12px;
+    background: var(--tg-theme-secondary-bg-color);
+    border: none;
+    border-radius: 12px;
+    color: var(--tg-theme-text-color);
+    font-size: 15px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.load-more:active {
+    opacity: 0.7;
+}
+
+.load-more:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Панель переводчика */
+.translator-panel {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 16px;
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+    background: var(--tg-theme-bg-color);
+    border-top: 1px solid var(--tg-theme-secondary-bg-color);
+}
+
+.add-chapter-button {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* Состояния загрузки и пустого контента */
+.loading-indicator {
+    text-align: center;
+    padding: 16px;
+    color: var(--tg-theme-hint-color);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 32px 16px;
+    color: var(--tg-theme-hint-color);
+}
+
+.empty-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--tg-theme-text-color);
+}
+
+/* Адаптивность */
+@media (max-width: 360px) {
+    .novel-header {
+        padding: 12px;
+    }
+
+    .novel-content {
+        padding: 12px;
+    }
+
+    .chapter-card {
+        padding: 12px;
+    }
+
+    .novel-title {
+        font-size: 20px;
+    }
+}
+
+/* Оптимизация производительности */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
