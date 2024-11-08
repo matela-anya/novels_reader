@@ -27,7 +27,7 @@
         <!-- Шапка новеллы -->
         <section class="novel-header">
             <div class="novel-cover">
-                <img src="/static/images/placeholder.png" alt="Обложка новеллы" class="novel-cover-image">
+                <img src="/api/placeholder/400/600" alt="Обложка новеллы" class="novel-cover-image">
             </div>
 
             <div class="novel-header-content">
@@ -35,9 +35,9 @@
 
                 <!-- Статистика -->
                 <div class="novel-stats">
-                    <span class="stat views" data-icon="👁">0 просмотров</span>
-                    <span class="stat subscribers" data-icon="👥">0 подписчиков</span>
-                    <span class="stat chapters" data-icon="📖">0 глав</span>
+                    <div class="stat views" data-icon="👁">0 просмотров</div>
+                    <div class="stat subscribers" data-icon="👥">0 подписчиков</div>
+                    <div class="stat chapters" data-icon="📖">0 глав</div>
                 </div>
 
                 <!-- Действия -->
@@ -45,7 +45,7 @@
                     <button class="action-button primary subscribe-button" data-haptic="medium">
                         Подписаться
                     </button>
-                    <button class="action-button bookmark-button" data-haptic="light">
+                    <button class="action-button bookmark-button" data-haptic="light" aria-label="Добавить в закладки">
                         <span class="icon">🔖</span>
                     </button>
                 </div>
@@ -58,7 +58,7 @@
             <section class="translator-info">
                 <a href="#" class="translator-link" data-haptic="light">
                     <div class="translator-avatar">
-                        <img src="/static/images/avatar.png" alt="Аватар">
+                        <img src="/api/placeholder/48/48" alt="Аватар переводчика">
                     </div>
                     <div class="translator-details">
                         <div class="translator-name"></div>
@@ -81,7 +81,7 @@
                     <div class="section-actions">
                         <button class="sort-button" data-haptic="light">
                             <span class="icon">🔄</span>
-                            <span class="sort-text">По номеру</span>
+                            <span class="sort-label">По номеру</span>
                         </button>
                     </div>
                 </div>
@@ -90,10 +90,11 @@
                     <!-- Главы будут добавлены через JavaScript -->
                 </div>
 
-                <button class="load-more" style="display: none;" data-haptic="light">
+                <button class="load-more" data-haptic="light" style="display: none;">
                     Загрузить еще
                 </button>
 
+                <!-- Пустое состояние -->
                 <div class="empty-state" style="display: none;">
                     <h3 class="empty-title">Нет глав</h3>
                     <p>Главы этой новеллы пока не опубликованы</p>
@@ -101,16 +102,21 @@
             </section>
         </div>
 
-        <!-- Нижняя панель для переводчика -->
+        <!-- Панель для переводчика -->
         <footer class="translator-panel" style="display: none;">
             <button class="button button-primary add-chapter-button" data-haptic="medium">
                 <span class="icon">📝</span>
                 Добавить главу
             </button>
         </footer>
+
+        <!-- Состояние загрузки -->
+        <div class="loading-indicator" style="display: none;">
+            Загрузка...
+        </div>
     </div>
 
-    <!-- Шаблон для главы -->
+    <!-- Шаблоны -->
     <template id="chapter-card-template">
         <div class="chapter-card" data-haptic="light">
             <h3 class="chapter-title"></h3>
