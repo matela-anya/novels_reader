@@ -1,1 +1,98 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="format-detection" content="telephone=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="MobileOptimized" content="176">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Чтение главы</title>
 
+    <!-- Telegram WebApp -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <!-- Стили -->
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="/static/css/chapter.css">
+
+    <!-- Скрипты -->
+    <script type="module" src="/static/js/api.js"></script>
+    <script type="module" src="/static/js/storage.js"></script>
+    <script type="module" src="/static/js/chapter.js"></script>
+</head>
+<body>
+    <div class="app-container chapter-page">
+        <!-- Прогресс чтения -->
+        <div class="reading-progress">
+            <div class="progress-bar"></div>
+        </div>
+
+        <!-- Шапка главы -->
+        <header class="chapter-header">
+            <!-- Навигация между главами -->
+            <nav class="chapter-nav">
+                <button class="nav-button prev-chapter" data-haptic="light" disabled>
+                    <span class="icon">←</span>
+                    <span class="nav-text">Предыдущая</span>
+                </button>
+
+                <button class="chapter-menu" data-haptic="light" aria-label="Меню главы">
+                    <span class="icon">⋮</span>
+                </button>
+
+                <button class="nav-button next-chapter" data-haptic="light" disabled>
+                    <span class="nav-text">Следующая</span>
+                    <span class="icon">→</span>
+                </button>
+            </nav>
+
+            <!-- Информация о главе -->
+            <div class="chapter-info">
+                <div class="novel-name"></div>
+                <h1 class="chapter-title"></h1>
+            </div>
+        </header>
+
+        <!-- Контент главы -->
+        <main class="chapter-content" role="main">
+            <!-- Контент будет добавлен через JavaScript -->
+        </main>
+
+        <!-- Настройки чтения -->
+        <div class="reading-settings">
+            <!-- Размер шрифта -->
+            <div class="settings-group">
+                <div class="settings-label">Размер текста</div>
+                <div class="font-size-controls">
+                    <button class="control-button font-size-decrease" data-haptic="light" aria-label="Уменьшить">A-</button>
+                    <button class="control-button font-size-default" data-haptic="light" aria-label="Сбросить">A</button>
+                    <button class="control-button font-size-increase" data-haptic="light" aria-label="Увеличить">A+</button>
+                </div>
+            </div>
+
+            <!-- Тема -->
+            <div class="settings-group">
+                <div class="settings-label">Тема</div>
+                <div class="theme-controls">
+                    <button class="control-button theme-light active" data-haptic="light" aria-label="Светлая тема">
+                        <span class="icon">☀️</span>
+                    </button>
+                    <button class="control-button theme-sepia" data-haptic="light" aria-label="Сепия">
+                        <span class="icon">📜</span>
+                    </button>
+                    <button class="control-button theme-dark" data-haptic="light" aria-label="Тёмная тема">
+                        <span class="icon">🌙</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Состояние загрузки -->
+        <div class="loading-indicator" style="display: none;">
+            Загрузка...
+        </div>
+    </div>
+</body>
+</html>
