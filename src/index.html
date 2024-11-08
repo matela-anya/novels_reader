@@ -28,7 +28,7 @@
             <h1 class="app-title">Novel Reader</h1>
 
             <!-- Кнопка для переводчика -->
-            <button class="button button-primary become-translator" data-role="become-translator">
+            <button class="button button-primary become-translator" data-role="become-translator" style="display: none;">
                 Стать переводчиком
             </button>
 
@@ -100,43 +100,35 @@
                     <!-- Контент будет добавлен через JavaScript -->
                 </div>
             </section>
-
-            <!-- Загрузка -->
-            <div class="loading-indicator" style="display: none;">
-                Загрузка...
-            </div>
         </main>
 
-        <!-- Нижняя панель -->
-        <footer class="app-footer" style="display: none;">
-            <!-- Будет показана для определенных действий -->
-        </footer>
-    </div>
+        <!-- Состояния загрузки -->
+        <div class="loading-indicator" style="display: none;">
+            Загрузка...
+        </div>
 
-    <!-- Шаблоны для JavaScript -->
-    <template id="novel-card-template">
-        <div class="novel-card" data-haptic="light">
-            <div class="novel-cover">
-                <img src="" alt="">
-            </div>
-            <div class="novel-info">
-                <h3 class="novel-title"></h3>
-                <div class="novel-meta">
-                    <span class="translator"></span>
-                    <span class="update-time"></span>
+        <!-- Шаблоны -->
+        <template id="novel-card-template">
+            <div class="novel-card" data-haptic="light">
+                <div class="novel-info">
+                    <h3 class="novel-title"></h3>
+                    <div class="novel-meta">
+                        <span class="translator"></span>
+                        <span class="update-time"></span>
+                    </div>
                 </div>
             </div>
-        </div>
-    </template>
+        </template>
 
-    <template id="chapter-card-template">
-        <div class="chapter-card" data-haptic="light">
-            <h3 class="chapter-title"></h3>
-            <div class="chapter-meta">
-                <span class="novel-title"></span>
-                <span class="publish-time"></span>
+        <template id="chapter-card-template">
+            <div class="chapter-card" data-haptic="light">
+                <h3 class="chapter-title"></h3>
+                <div class="chapter-meta">
+                    <span class="novel-title"></span>
+                    <span class="publish-time"></span>
+                </div>
             </div>
-        </div>
-    </template>
+        </template>
+    </div>
 </body>
 </html>
