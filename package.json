@@ -1,1 +1,22 @@
-
+{
+  "name": "novels-reader",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "vercel dev",
+    "deploy": "vercel deploy --prod"
+  },
+  "dependencies": {
+    "@vercel/postgres": "latest",
+    "fastapi": "^0.109.0",
+    "python-dotenv": "^1.0.0"
+  },
+  "devDependencies": {
+    "vercel": "latest"
+  },
+  "engines": {
+    "node": ">=18",
+    "python": "3.9"
+  }
+}
