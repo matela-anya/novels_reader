@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="format-detection" content="telephone=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="MobileOptimized" content="176">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Кабинет переводчика</title>
+
+    <!-- Telegram WebApp -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <!-- Стили -->
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="/static/css/translator.css">
+
+    <!-- Скрипты -->
+    <script type="module" src="/static/js/api.js"></script>
+    <script type="module" src="/static/js/storage.js"></script>
+    <script type="module" src="/static/js/translator.js"></script>
+</head>
+<body>
+    <div class="app-container translator-page">
+        <!-- Шапка -->
+        <header class="app-header">
+            <div class="header-content">
+                <h1 class="app-title">Кабинет переводчика</h1>
+                <button class="back-button" data-haptic="light" aria-label="На главный экран">
+                    <span class="icon">←</span>
+                </button>
+            </div>
+            
+            <!-- Статистика -->
+            <div class="translator-stats">
+                <div class="stat" data-icon="📚">
+                    <span class="stat-value">0</span> новелл
+                </div>
+                <div class="stat" data-icon="📝">
+                    <span class="stat-value">0</span> глав
+                </div>
+                <div class="stat" data-icon="👥">
+                    <span class="stat-value">0</span> подписчиков
+                </div>
+            </div>
+        </header>
+
+        <!-- Табы -->
+        <div class="tabs">
+            <button class="tab-button active" data-section="novels" data-haptic="selection">
+                <span class="tab-icon">📚</span> Мои новеллы
+            </button>
+            <button class="tab-button" data-section="stats" data-haptic="selection">
+                <span class="tab-icon">📊</span> Статистика
+            </button>
+        </div>
+
+        <!-- Основной контент -->
+        <main class="main-content" role="main">
+            <!-- Секция новелл -->
+            <section class="section active" data-section="novels">
+                <div class="section-header">
+                    <h2 class="section-title">Мои новеллы</h2>
+                    <button class="add-button" data-haptic="medium">
+                        <span class="icon">➕</span>
+                        Добавить новеллу
+                    </button>
+                </div>
+                <div class="novels-list">
+                    <!-- Новеллы будут добавлены через JavaScript -->
+                </div>
+                <div class="empty-state">
+                    <h3 class="empty-title">Нет новелл</h3>
+                    <p>Нажмите "Добавить новеллу", чтобы начать публикацию</p>
+                </div>
+            </section>
+
+            <!-- Секция статистики -->
+            <section class="section" data-section="stats">
+                <div class="section-header">
+                    <h2 class="section-title">Статистика</h2>
+                    <div class="section-actions">
+                        <button class="filter-button" data-haptic="light">
+                            <span class="icon">📅</span>
+                            За месяц
+                        </button>
+                    </div>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card total-views">
+                        <div class="stat-title">Просмотры</div>
+                        <div class="stat-value">0</div>
+                        <div class="stat-change positive">+0%</div>
+                    </div>
+                    <div class="stat-card total-subscribers">
+                        <div class="stat-title">Подписчики</div>
+                        <div class="stat-value">0</div>
+                        <div class="stat-change positive">+0%</div>
+                    </div>
+                    <div class="stat-card chapters-published">
+                        <div class="stat-title">Опубликовано глав</div>
+                        <div class="stat-value">0</div>
+                        <div class="stat-change neutral">0</div>
+                    </div>
+                </div>
+                <div class="stats-chart">
+                    <!-- График будет добавлен через JavaScript -->
+                </div>
+            </section>
+        </main>
+
+        <!-- Нижняя панель с действиями -->
+        <footer class="action-panel">
+            <button class="button button-primary add-action-button" data-haptic="medium">
+                <span class="icon">➕</span>
+                Добавить новеллу
+            </button>
+        </footer>
+
+        <!-- Состояние загрузки -->
+        <div class="loading-indicator" style="display: none;">
+            Загрузка...
+        </div>
+    </div>
+
+    <!-- Шаблон карточки новеллы -->
+    <template id="novel-card-template">
+        <div class="novel-card" data-haptic="light">
+            <div class="novel-info">
+                <h3 class="novel-title"></h3>
+                <div class="novel-meta">
+                    <span class="chapters-count"></span>
+                    <span class="subscribers-count"></span>
+                </div>
+            </div>
+            <button class="action-button" data-haptic="light" aria-label="Действия">
+                <span class="icon">⋮</span>
+            </button>
+        </div>
+    </template>
+</body>
+</html>
