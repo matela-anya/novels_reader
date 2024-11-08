@@ -1,1 +1,225 @@
+/* Reset и базовые стили */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: none;
+}
 
+/* Основные настройки */
+:root {
+    --safe-area-inset-top: env(safe-area-inset-top, 0px);
+    --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: var(--tg-theme-bg-color, #fff);
+    color: var(--tg-theme-text-color, #000);
+    font-size: 16px;
+    line-height: 1.4;
+    min-height: 100vh;
+    padding: 0;
+    margin: 0;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Контейнер приложения */
+.app-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    padding-top: calc(env(safe-area-inset-top, 0px) + 8px);
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
+}
+
+/* Шапка */
+.app-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--tg-theme-bg-color);
+    padding: 12px 16px;
+    padding-top: max(12px, env(safe-area-inset-top));
+    border-bottom: 1px solid var(--tg-theme-secondary-bg-color);
+}
+
+.app-title {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--tg-theme-text-color);
+}
+
+/* Основной контент */
+.main-content {
+    flex: 1;
+    padding: 16px;
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+}
+
+/* Кнопки */
+.button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 16px;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+    gap: 8px;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.button:active {
+    opacity: 0.7;
+}
+
+.button-primary {
+    background: var(--tg-theme-button-color);
+    color: var(--tg-theme-button-text-color);
+}
+
+.button-secondary {
+    background: var(--tg-theme-secondary-bg-color);
+    color: var(--tg-theme-text-color);
+}
+
+/* Поле ввода */
+.input {
+    width: 100%;
+    padding: 12px 16px;
+    background: var(--tg-theme-secondary-bg-color);
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    color: var(--tg-theme-text-color);
+    transition: background-color 0.2s ease;
+}
+
+.input::placeholder {
+    color: var(--tg-theme-hint-color);
+}
+
+.input:focus {
+    outline: none;
+    background: var(--tg-theme-secondary-bg-color);
+}
+
+/* Состояния загрузки */
+.loading-indicator {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 16px;
+    background: var(--tg-theme-secondary-bg-color);
+    border-radius: 12px;
+    color: var(--tg-theme-text-color);
+    z-index: 1000;
+}
+
+/* Пустые состояния */
+.empty-state {
+    text-align: center;
+    padding: 32px 16px;
+    color: var(--tg-theme-hint-color);
+}
+
+.empty-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--tg-theme-text-color);
+}
+
+/* Списки */
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Карточки */
+.card {
+    padding: 16px;
+    background: var(--tg-theme-secondary-bg-color);
+    border-radius: 12px;
+    transition: opacity 0.2s ease;
+}
+
+.card:active {
+    opacity: 0.7;
+}
+
+/* Общие анимации */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
+
+/* Иконки */
+.icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1em;
+    height: 1em;
+}
+
+/* Оптимизация производительности */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* Адаптивность */
+@media (max-width: 360px) {
+    .app-header {
+        padding: 8px 12px;
+    }
+
+    .main-content {
+        padding: 12px;
+    }
+
+    .app-title {
+        font-size: 24px;
+    }
+
+    .button {
+        padding: 10px 14px;
+    }
+
+    .card {
+        padding: 12px;
+    }
+}
+
+/* Утилиты */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
