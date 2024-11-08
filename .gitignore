@@ -12,6 +12,7 @@ node_modules/
 .env.development.local
 .env.test.local
 .env.production.local
+npm-debug.log*
 
 # IDE
 .vscode/
@@ -23,11 +24,9 @@ node_modules/
 .DS_Store
 Thumbs.db
 
-# Logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
 # Vercel
 .vercel
+.build
+
+# Logs
+*.log
