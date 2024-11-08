@@ -26,9 +26,9 @@ class NovelReader {
         };
 
         // Привязка методов к контексту
-        this.handleScroll = this.handleScroll.bind(this);
         this.handleTabClick = this.handleTabClick.bind(this);
         this.handleSearch = this.handleSearch.bind(this);
+        this.handleScroll = this.handleScroll.bind(this);
         this.handleBecomeTranslator = this.handleBecomeTranslator.bind(this);
     }
 
@@ -48,10 +48,7 @@ class NovelReader {
             this.initUI();
             
             // Загружаем начальный контент
-            await this.loadContent();
-
-            // Инициализируем бесконечную прокрутку
-            this.initInfiniteScroll();
+            await this.loadContent(true);
 
             console.log('App initialized successfully');
         } catch (error) {
@@ -61,10 +58,7 @@ class NovelReader {
     }
 
     initTheme() {
-        // Устанавливаем тему
         document.documentElement.className = this.telegram.colorScheme;
-        
-        // Слушаем изменения темы
         this.telegram.onEvent('themeChanged', () => {
             document.documentElement.className = this.telegram.colorScheme;
         });
@@ -72,11 +66,11 @@ class NovelReader {
 
     async loadUserData() {
         try {
-            // Загружаем роль пользователя
+            // Проверяем роль пользователя
             const role = await storage.getUserRole();
             this.state.isTranslator = role === 'translator';
 
-            // Загружаем данные пользователя
+            // Загружаем пользовательские данные
             const [subscriptions, bookmarks] = await Promise.all([
                 storage.getSubscriptions(),
                 storage.getBookmarks()
@@ -84,6 +78,12 @@ class NovelReader {
 
             this.state.subscriptions = subscriptions;
             this.state.bookmarks = bookmarks;
+
+            console.log('User data loaded:', {
+                role,
+                subscriptions: subscriptions.length,
+                bookmarks: bookmarks.length
+            });
         } catch (error) {
             console.error('Error loading user data:', error);
             throw error;
@@ -93,9 +93,13 @@ class NovelReader {
     initUI() {
         // Кнопка "Стать переводчиком"
         const translatorBtn = document.querySelector('[data-role="become-translator"]');
-        if (translatorBtn && !this.state.isTranslator) {
-            translatorBtn.style.display = 'block';
-            translatorBtn.addEventListener('click', this.handleBecomeTranslator);
+        if (translatorBtn) {
+            if (this.state.isTranslator) {
+                translatorBtn.remove(); // Удаляем кнопку если уже переводчик
+            } else {
+                translatorBtn.style.display = 'block';
+                translatorBtn.addEventListener('click', this.handleBecomeTranslator);
+            }
         }
 
         // Табы
@@ -116,35 +120,47 @@ class NovelReader {
         }
 
         // Кнопки фильтров и сортировки
-        const filterBtn = document.querySelector('.filter-button');
-        const sortBtn = document.querySelector('.sort-button');
+        document.querySelectorAll('[data-haptic]').forEach(element => {
+            element.addEventListener('click', () => {
+                this.telegram.HapticFeedback.impactOccurred('light');
+            });
+        });
 
-        if (filterBtn) {
-            filterBtn.addEventListener('click', () => this.showFilters());
-        }
-
-        if (sortBtn) {
-            sortBtn.addEventListener('click', () => this.showSorting());
-        }
+        // Бесконечная прокрутка
+        window.addEventListener('scroll', this.handleScroll);
     }
 
-    initInfiniteScroll() {
-        // Используем IntersectionObserver для бесконечной прокрутки
-        const observer = new IntersectionObserver(
-            (entries) => {
-                const lastEntry = entries[0];
-                if (lastEntry.isIntersecting && !this.state.isLoading && this.state.hasMoreContent) {
-                    this.loadMoreContent();
-                }
-            },
-            { threshold: 0.5 }
-        );
+    async handleBecomeTranslator() {
+        // Вибрация при нажатии
+        this.telegram.HapticFeedback.impactOccurred('medium');
 
-        // Добавляем элемент-триггер
-        const trigger = document.createElement('div');
-        trigger.className = 'scroll-trigger';
-        document.querySelector('.main-content').appendChild(trigger);
-        observer.observe(trigger);
+        this.telegram.showPopup({
+            title: 'Стать переводчиком',
+            message: 'Вы хотите стать переводчиком и публиковать свои переводы новелл?',
+            buttons: [
+                {id: 'yes', type: 'default', text: 'Да'},
+                {id: 'no', type: 'cancel'}
+            ]
+        }, async (buttonId) => {
+            if (buttonId === 'yes') {
+                try {
+                    await storage.setUserRole('translator');
+                    this.state.isTranslator = true;
+                    
+                    // Успешная вибрация
+                    this.telegram.HapticFeedback.notificationOccurred('success');
+
+                    // Удаляем кнопку
+                    document.querySelector('[data-role="become-translator"]')?.remove();
+
+                    this.showSuccess('Теперь вы можете публиковать свои переводы!');
+                } catch (error) {
+                    console.error('Error becoming translator:', error);
+                    this.telegram.HapticFeedback.notificationOccurred('error');
+                    this.showError('Не удалось обновить роль');
+                }
+            }
+        });
     }
 
     async loadContent(reset = false) {
@@ -152,6 +168,8 @@ class NovelReader {
             this.state.currentPage = 1;
             this.state.hasMoreContent = true;
         }
+
+        if (!this.state.hasMoreContent || this.state.isLoading) return;
 
         const container = document.querySelector(`[data-section="${this.state.activeTab}"] .novels-list, [data-section="${this.state.activeTab}"] .chapters-list`);
         const emptyState = document.querySelector(`[data-section="${this.state.activeTab}"] .empty-state`);
@@ -176,7 +194,7 @@ class NovelReader {
             }
 
             // Проверяем, есть ли еще контент
-            this.state.hasMoreContent = content.length === 20; // Предполагаем, что 20 - размер страницы
+            this.state.hasMoreContent = content.length === 20;
 
             if (content.length || !reset) {
                 this.renderContent(container, content, reset);
@@ -192,11 +210,6 @@ class NovelReader {
             this.state.isLoading = false;
             this.toggleLoading(false);
         }
-    }
-
-    async loadMoreContent() {
-        this.state.currentPage++;
-        await this.loadContent(false);
     }
 
     async loadSubscriptions() {
@@ -216,14 +229,13 @@ class NovelReader {
     }
 
     async loadLatestChapters() {
-        const params = this.state.searchQuery ? 
-            { query: this.state.searchQuery } : 
-            { page: this.state.currentPage };
-            
-        return api.getLatestChapters(params);
+        return api.getLatestChapters({
+            page: this.state.currentPage,
+            query: this.state.searchQuery
+        });
     }
 
-    renderContent(container, content, reset = false) {
+    renderContent(container, items, reset = false) {
         const template = document.getElementById(
             this.state.activeTab === 'latest' ? 
             'chapter-card-template' : 
@@ -232,7 +244,7 @@ class NovelReader {
 
         const fragment = document.createDocumentFragment();
 
-        content.forEach(item => {
+        items.forEach(item => {
             const element = template.content.cloneNode(true);
             
             if (this.state.activeTab === 'latest') {
@@ -254,12 +266,6 @@ class NovelReader {
         element.querySelector('.novel-title').textContent = novel.title;
         element.querySelector('.translator').textContent = novel.translator_name;
         element.querySelector('.update-time').textContent = this.formatDate(novel.updated_at);
-        
-        const cover = element.querySelector('.novel-cover img');
-        if (cover) {
-            cover.src = novel.cover_url || '/static/images/no-cover.png';
-            cover.alt = novel.title;
-        }
 
         element.querySelector('.novel-card').addEventListener('click', () => {
             this.telegram.HapticFeedback.impactOccurred('light');
@@ -303,113 +309,28 @@ class NovelReader {
     }
 
     async handleSearch(query) {
+        if (query === this.state.searchQuery) return;
+        
         this.state.searchQuery = query;
         await this.loadContent(true);
     }
 
-    handleBecomeTranslator() {
-        // Haptic feedback
-        this.telegram.HapticFeedback.impactOccurred('medium');
+    handleScroll() {
+        if (this.state.isLoading || !this.state.hasMoreContent) return;
 
-        this.telegram.showPopup({
-            title: 'Стать переводчиком',
-            message: 'Хотите стать переводчиком и публиковать свои переводы?',
-            buttons: [
-                {id: 'yes', type: 'default', text: 'Да'},
-                {id: 'no', type: 'cancel'}
-            ]
-        }, async (buttonId) => {
-            if (buttonId === 'yes') {
-                try {
-                    await storage.setUserRole('translator');
-                    this.state.isTranslator = true;
-                    
-                    // Success feedback
-                    this.telegram.HapticFeedback.notificationOccurred('success');
-                    
-                    // Скрываем кнопку
-                    document.querySelector('[data-role="become-translator"]')?.remove();
+        const scrollY = window.scrollY;
+        const windowHeight = window.innerHeight;
+        const documentHeight = document.documentElement.scrollHeight;
 
-                    this.showSuccess('Теперь вы можете публиковать переводы');
-                } catch (error) {
-                    console.error('Error becoming translator:', error);
-                    this.telegram.HapticFeedback.notificationOccurred('error');
-                    this.showError('Не удалось обновить роль');
-                }
-            }
-        });
-    }
-
-    showFilters() {
-        this.telegram.HapticFeedback.impactOccurred('light');
-        this.telegram.showPopup({
-            title: 'Фильтры',
-            message: 'Выберите фильтры:',
-            buttons: [
-                {
-                    id: 'subscribed',
-                    type: 'default',
-                    text: 'Только подписки'
-                },
-                {
-                    id: 'all',
-                    type: 'default',
-                    text: 'Все новеллы'
-                },
-                {
-                    id: 'cancel',
-                    type: 'cancel'
-                }
-            ]
-        });
-    }
-
-    showSorting() {
-        this.telegram.HapticFeedback.impactOccurred('light');
-        this.telegram.showPopup({
-            title: 'Сортировка',
-            message: 'Выберите порядок:',
-            buttons: [
-                {
-                    id: 'newest',
-                    type: 'default',
-                    text: 'Сначала новые'
-                },
-                {
-                    id: 'oldest',
-                    type: 'default',
-                    text: 'Сначала старые'
-                },
-                {
-                    id: 'cancel',
-                    type: 'cancel'
-                }
-            ]
-        });
-    }
-
-    showError(message) {
-        this.telegram.HapticFeedback.notificationOccurred('error');
-        this.telegram.showPopup({
-            title: 'Ошибка',
-            message: message,
-            buttons: [{type: 'close'}]
-        });
-    }
-
-    showSuccess(message) {
-        this.telegram.HapticFeedback.notificationOccurred('success');
-        this.telegram.showPopup({
-            title: 'Успешно',
-            message: message,
-            buttons: [{type: 'close'}]
-        });
+        if (scrollY + windowHeight >= documentHeight - 200) {
+            this.loadContent();
+        }
     }
 
     toggleLoading(show) {
-        const loader = document.querySelector('.loading-indicator');
-        if (loader) {
-            loader.style.display = show ? 'block' : 'none';
+        const loadingIndicator = document.querySelector('.loading-indicator');
+        if (loadingIndicator) {
+            loadingIndicator.style.display = show ? 'block' : 'none';
         }
     }
 
@@ -429,16 +350,22 @@ class NovelReader {
         }
     }
 
-    handleScroll() {
-        if (this.state.isLoading || !this.state.hasMoreContent) return;
+    showError(message) {
+        this.telegram.HapticFeedback.notificationOccurred('error');
+        this.telegram.showPopup({
+            title: 'Ошибка',
+            message,
+            buttons: [{type: 'close'}]
+        });
+    }
 
-        const scrollY = window.scrollY;
-        const windowHeight = window.innerHeight;
-        const documentHeight = document.documentElement.scrollHeight;
-
-        if (scrollY + windowHeight >= documentHeight - 200) {
-            this.loadMoreContent();
-        }
+    showSuccess(message) {
+        this.telegram.HapticFeedback.notificationOccurred('success');
+        this.telegram.showPopup({
+            title: 'Успешно',
+            message,
+            buttons: [{type: 'close'}]
+        });
     }
 }
 
@@ -462,5 +389,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Экспортируем класс для использования в других модулях
 export default NovelReader;
