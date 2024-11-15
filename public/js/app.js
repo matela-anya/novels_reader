@@ -29,7 +29,7 @@ class NovelReader {
         this.handleTabClick = this.handleTabClick.bind(this);
         this.handleSearch = this.handleSearch.bind(this);
         this.handleScroll = this.handleScroll.bind(this);
-        this.handleBecomeTranslator = this.handleBecomeTranslator.bind(this);
+        this.handleTranslatorAction = this.handleTranslatorAction.bind(this);
     }
 
     async init() {
@@ -79,6 +79,9 @@ class NovelReader {
             this.state.subscriptions = subscriptions;
             this.state.bookmarks = bookmarks;
 
+            // Обновляем кнопку переводчика
+            this.updateTranslatorButton();
+
             console.log('User data loaded:', {
                 role,
                 subscriptions: subscriptions.length,
@@ -90,16 +93,24 @@ class NovelReader {
         }
     }
 
+    updateTranslatorButton() {
+        const button = document.querySelector('[data-role="translator-action"]');
+        if (!button) return;
+
+        if (this.state.isTranslator) {
+            button.innerHTML = '<span class="button-icon">📝</span> Кабинет';
+        } else {
+            button.innerHTML = '<span class="button-icon">📝</span> Стать переводчиком';
+        }
+
+        button.style.display = 'flex';
+    }
+
     initUI() {
-        // Кнопка "Стать переводчиком"
-        const translatorBtn = document.querySelector('[data-role="become-translator"]');
+        // Кнопка переводчика
+        const translatorBtn = document.querySelector('[data-role="translator-action"]');
         if (translatorBtn) {
-            if (this.state.isTranslator) {
-                translatorBtn.remove(); // Удаляем кнопку если уже переводчик
-            } else {
-                translatorBtn.style.display = 'block';
-                translatorBtn.addEventListener('click', this.handleBecomeTranslator);
-            }
+            translatorBtn.addEventListener('click', this.handleTranslatorAction);
         }
 
         // Табы
@@ -128,36 +139,75 @@ class NovelReader {
 
         // Бесконечная прокрутка
         window.addEventListener('scroll', this.handleScroll);
+
+        // Главная кнопка
+        this.telegram.MainButton.hide();
     }
 
-    async handleBecomeTranslator() {
-        // Вибрация при нажатии
+    async handleTranslatorAction() {
         this.telegram.HapticFeedback.impactOccurred('medium');
 
+        if (this.state.isTranslator) {
+            // Переход в кабинет переводчика
+            window.location.href = '/translator.html';
+        } else {
+            // Показываем попап с формой регистрации переводчика
+            this.telegram.showPopup({
+                title: 'Стать переводчиком',
+                message: 'Хотите стать переводчиком и публиковать свои переводы новелл?',
+                buttons: [
+                    {id: 'confirm', type: 'default', text: 'Продолжить'},
+                    {id: 'cancel', type: 'cancel'}
+                ]
+            }, async (buttonId) => {
+                if (buttonId === 'confirm') {
+                    this.showTranslatorRegistration();
+                }
+            });
+        }
+    }
+
+    showTranslatorRegistration() {
+        // Получаем данные пользователя из initData
+        const user = this.telegram.initDataUnsafe?.user;
+        if (!user) {
+            this.showError('Не удалось получить данные пользователя');
+            return;
+        }
+
+        // Показываем форму с предзаполненными данными
         this.telegram.showPopup({
-            title: 'Стать переводчиком',
-            message: 'Вы хотите стать переводчиком и публиковать свои переводы новелл?',
+            title: 'Регистрация переводчика',
+            message: 'Заполните информацию о себе:',
             buttons: [
-                {id: 'yes', type: 'default', text: 'Да'},
-                {id: 'no', type: 'cancel'}
+                {id: 'register', type: 'default', text: 'Зарегистрироваться'},
+                {id: 'cancel', type: 'cancel'}
             ]
         }, async (buttonId) => {
-            if (buttonId === 'yes') {
+            if (buttonId === 'register') {
                 try {
+                    // Регистрируем переводчика
+                    await api.createTranslator({
+                        user_id: user.id.toString(),
+                        username: user.username || null,
+                        display_name: user.first_name + (user.last_name ? ` ${user.last_name}` : ''),
+                    });
+
+                    // Обновляем роль в CloudStorage
                     await storage.setUserRole('translator');
                     this.state.isTranslator = true;
                     
-                    // Успешная вибрация
+                    // Обновляем UI
+                    this.updateTranslatorButton();
+
+                    // Уведомляем пользователя
                     this.telegram.HapticFeedback.notificationOccurred('success');
+                    this.showSuccess('Вы успешно зарегистрировались как переводчик!');
 
-                    // Удаляем кнопку
-                    document.querySelector('[data-role="become-translator"]')?.remove();
-
-                    this.showSuccess('Теперь вы можете публиковать свои переводы!');
                 } catch (error) {
-                    console.error('Error becoming translator:', error);
+                    console.error('Error registering translator:', error);
                     this.telegram.HapticFeedback.notificationOccurred('error');
-                    this.showError('Не удалось обновить роль');
+                    this.showError('Не удалось зарегистрироваться');
                 }
             }
         });
