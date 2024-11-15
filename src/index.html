@@ -27,7 +27,7 @@
             <div class="header-content">
                 <h1 class="app-title">Novel Reader</h1>
                 <div class="header-actions">
-                    <!-- Кнопка для переводчика/стать переводчиком -->
+                    <!-- Кнопка для переводчика -->
                     <button class="header-button translator-button" style="display: none;" data-role="translator-action">
                         <span class="button-icon">📝</span>
                     </button>
@@ -57,44 +57,49 @@
 
         <div class="main-content" role="main">
             <!-- Секция подписок -->
-            <div class="section active" data-section="subscriptions">
-                <div class="section-header">
+            <section class="section active" data-section="subscriptions">
+                <header class="section-header">
                     <h2 class="section-title">Подписки</h2>
-                </div>
+                </header>
+                
                 <div class="novels-list"></div>
+                
                 <div class="empty-state">
                     <h3 class="empty-title">Нет подписок</h3>
                     <p>Найдите интересные новеллы и подпишитесь на их обновления</p>
                 </div>
-            </div>
+            </section>
 
             <!-- Секция закладок -->
-            <div class="section" data-section="bookmarks">
-                <div class="section-header">
+            <section class="section" data-section="bookmarks">
+                <header class="section-header">
                     <h2 class="section-title">Закладки</h2>
-                </div>
+                </header>
+                
                 <div class="novels-list"></div>
+                
                 <div class="empty-state">
                     <h3 class="empty-title">Нет закладок</h3>
                     <p>Добавляйте новеллы в закладки, чтобы не потерять их</p>
                 </div>
-            </div>
+            </section>
 
             <!-- Секция новых глав -->
-            <div class="section" data-section="latest">
-                <div class="section-header">
+            <section class="section" data-section="latest">
+                <header class="section-header">
                     <h2 class="section-title">Новые главы</h2>
                     <div class="section-actions">
                         <button class="action-button" data-haptic="light">
-                            <span class="icon">📊</span> Фильтры
+                            <span class="button-icon">📊</span> Фильтры
                         </button>
                         <button class="action-button" data-haptic="light">
-                            <span class="icon">🔄</span> Сортировка
+                            <span class="button-icon">🔄</span> Сортировка
                         </button>
                     </div>
-                </div>
+                </header>
+                
                 <div class="chapters-list"></div>
-            </div>
+            </section>
         </div>
 
         <!-- Индикатор загрузки -->
@@ -102,7 +107,7 @@
             Загрузка...
         </div>
 
-        <!-- Шаблон карточки новеллы -->
+        <!-- Шаблоны -->
         <template id="novel-card-template">
             <div class="novel-card" data-haptic="light">
                 <div class="novel-info">
@@ -115,7 +120,6 @@
             </div>
         </template>
 
-        <!-- Шаблон карточки главы -->
         <template id="chapter-card-template">
             <div class="chapter-card" data-haptic="light">
                 <h3 class="chapter-title"></h3>
@@ -126,7 +130,5 @@
             </div>
         </template>
     </div>
-
-    <script type="module" src="/public/js/app.js"></script>
 </body>
 </html>
