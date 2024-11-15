@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "buildCommand": "npm run build",
   "builds": [
     {
       "src": "api/main.py",
@@ -32,8 +31,5 @@
       "src": "/",
       "dest": "/src/index.html"
     }
-  ],
-  "env": {
-    "POSTGRES_URL": "@postgres_url"
-  }
+  ]
 }
