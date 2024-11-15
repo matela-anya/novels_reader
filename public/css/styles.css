@@ -15,8 +15,8 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    background: var(--tg-theme-bg-color, #fff);
-    color: var(--tg-theme-text-color, #000);
+    background: var(--tg-theme-bg-color);
+    color: var(--tg-theme-text-color);
     font-size: 16px;
     line-height: 1.4;
     min-height: 100vh;
@@ -32,70 +32,69 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    padding-top: calc(env(safe-area-inset-top, 0px) + 8px);
-    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
+    padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
 }
 
 /* Шапка */
 .app-header {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: var(--tg-theme-bg-color);
     padding: 12px 16px;
-    padding-top: max(12px, env(safe-area-inset-top));
-    border-bottom: 1px solid var(--tg-theme-secondary-bg-color);
+    background: var(--tg-theme-bg-color);
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
 }
 
 .app-title {
     font-size: 28px;
     font-weight: 700;
-    margin-bottom: 16px;
     color: var(--tg-theme-text-color);
+    margin: 0;
 }
 
-/* Основной контент */
-.main-content {
-    flex: 1;
-    padding: 16px;
-    padding-bottom: max(16px, env(safe-area-inset-bottom));
+.header-actions {
+    display: flex;
+    gap: 8px;
 }
 
-/* Кнопки */
-.button {
+/* Кнопки в шапке */
+.header-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 12px 16px;
+    padding: 8px 12px;
     border: none;
-    border-radius: 10px;
-    font-size: 15px;
-    font-weight: 500;
+    border-radius: 8px;
+    background: var(--tg-theme-secondary-bg-color);
+    color: var(--tg-theme-text-color);
+    font-size: 14px;
+    gap: 6px;
     cursor: pointer;
     transition: opacity 0.15s ease;
-    gap: 8px;
-    user-select: none;
-    -webkit-user-select: none;
+    white-space: nowrap;
 }
 
-.button:active {
+.header-button:active {
     opacity: 0.7;
 }
 
-.button-primary {
-    background: var(--tg-theme-button-color);
-    color: var(--tg-theme-button-text-color);
+.button-icon {
+    font-size: 16px;
 }
 
-.button-secondary {
-    background: var(--tg-theme-secondary-bg-color);
-    color: var(--tg-theme-text-color);
+/* Поиск */
+.search-container {
+    margin: 0 16px 12px;
+    position: relative;
 }
 
-/* Поле ввода */
-.input {
+.search-input {
     width: 100%;
-    padding: 12px 16px;
+    height: 36px;
+    padding: 0 12px;
     background: var(--tg-theme-secondary-bg-color);
     border: none;
     border-radius: 10px;
@@ -104,13 +103,185 @@ body {
     transition: background-color 0.2s ease;
 }
 
-.input::placeholder {
+.search-input::placeholder {
     color: var(--tg-theme-hint-color);
 }
 
-.input:focus {
+.search-input:focus {
     outline: none;
     background: var(--tg-theme-secondary-bg-color);
+}
+
+/* Табы */
+.tabs {
+    display: flex;
+    gap: 8px;
+    padding: 0 16px 12px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    -webkit-overflow-scrolling: touch;
+}
+
+.tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.tab-button {
+    flex: 1;
+    min-width: fit-content;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 10px;
+    background: var(--tg-theme-secondary-bg-color);
+    color: var(--tg-theme-text-color);
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.tab-button.active {
+    background: var(--tg-theme-button-color);
+    color: var(--tg-theme-button-text-color);
+}
+
+.tab-button:active {
+    opacity: 0.7;
+}
+
+.tab-icon {
+    font-size: 16px;
+}
+
+/* Основной контент */
+.main-content {
+    flex: 1;
+    padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
+}
+
+/* Заголовки секций */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.section-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--tg-theme-text-color);
+    margin: 0;
+}
+
+.section-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.action-button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 8px;
+    background: var(--tg-theme-secondary-bg-color);
+    color: var(--tg-theme-text-color);
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.action-button:active {
+    opacity: 0.7;
+}
+
+/* Списки */
+.novels-list,
+.chapters-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Карточки новелл */
+.novel-card {
+    padding: 16px;
+    background: var(--tg-theme-secondary-bg-color);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.novel-card:active {
+    opacity: 0.7;
+}
+
+.novel-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 4px;
+    color: var(--tg-theme-text-color);
+}
+
+.novel-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: var(--tg-theme-hint-color);
+}
+
+/* Карточки глав */
+.chapter-card {
+    padding: 16px;
+    background: var(--tg-theme-secondary-bg-color);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.chapter-card:active {
+    opacity: 0.7;
+}
+
+.chapter-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 4px;
+    color: var(--tg-theme-text-color);
+}
+
+.chapter-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: var(--tg-theme-hint-color);
+}
+
+/* Пустые состояния */
+.empty-state {
+    text-align: center;
+    padding: 32px 16px;
+    color: var(--tg-theme-hint-color);
+    display: none;
+}
+
+.empty-state.visible {
+    display: block;
+}
+
+.empty-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--tg-theme-text-color);
 }
 
 /* Состояния загрузки */
@@ -124,69 +295,6 @@ body {
     border-radius: 12px;
     color: var(--tg-theme-text-color);
     z-index: 1000;
-}
-
-/* Пустые состояния */
-.empty-state {
-    text-align: center;
-    padding: 32px 16px;
-    color: var(--tg-theme-hint-color);
-}
-
-.empty-title {
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: 8px;
-    color: var(--tg-theme-text-color);
-}
-
-/* Списки */
-.list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-/* Карточки */
-.card {
-    padding: 16px;
-    background: var(--tg-theme-secondary-bg-color);
-    border-radius: 12px;
-    transition: opacity 0.2s ease;
-}
-
-.card:active {
-    opacity: 0.7;
-}
-
-/* Общие анимации */
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-@keyframes slideUp {
-    from { transform: translateY(100%); }
-    to { transform: translateY(0); }
-}
-
-/* Иконки */
-.icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 1em;
-    height: 1em;
-}
-
-/* Оптимизация производительности */
-@media (prefers-reduced-motion: reduce) {
-    * {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-        scroll-behavior: auto !important;
-    }
 }
 
 /* Адаптивность */
@@ -203,12 +311,19 @@ body {
         font-size: 24px;
     }
 
-    .button {
-        padding: 10px 14px;
-    }
-
-    .card {
+    .novel-card,
+    .chapter-card {
         padding: 12px;
+    }
+}
+
+/* Оптимизация производительности */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
     }
 }
 
