@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -23,91 +23,86 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- Шапка приложения -->
-        <header class="app-header">
-            <h1 class="app-title">Novel Reader</h1>
-
-            <!-- Кнопка для переводчика -->
-            <button class="button button-primary become-translator" data-role="become-translator" style="display: none;">
-                Стать переводчиком
-            </button>
-
-            <!-- Поиск -->
-            <div class="search-container">
-                <input type="search" class="search-input" placeholder="Поиск новелл...">
+        <div class="app-header">
+            <div class="header-content">
+                <h1 class="app-title">Novel Reader</h1>
+                <div class="header-actions">
+                    <!-- Кнопка для переводчика/стать переводчиком -->
+                    <button class="header-button translator-button" style="display: none;" data-role="translator-action">
+                        <span class="button-icon">📝</span>
+                    </button>
+                    <!-- Меню -->
+                    <button class="header-button menu-button">
+                        <span class="button-icon">⋮</span>
+                    </button>
+                </div>
             </div>
 
-            <!-- Табы -->
+            <div class="search-container">
+                <input type="search" class="search-input" placeholder="Поиск новелл..." />
+            </div>
+
             <div class="tabs">
-                <button class="tab-button active" data-section="subscriptions" data-haptic="selection">
+                <button class="tab-button active" data-section="subscriptions">
                     <span class="tab-icon">📚</span> Подписки
                 </button>
-                <button class="tab-button" data-section="bookmarks" data-haptic="selection">
+                <button class="tab-button" data-section="bookmarks">
                     <span class="tab-icon">🔖</span> Закладки
                 </button>
-                <button class="tab-button" data-section="latest" data-haptic="selection">
+                <button class="tab-button" data-section="latest">
                     <span class="tab-icon">🆕</span> Новые главы
                 </button>
             </div>
-        </header>
+        </div>
 
-        <!-- Основной контент -->
-        <main class="main-content" role="main">
+        <div class="main-content" role="main">
             <!-- Секция подписок -->
-            <section class="section active" data-section="subscriptions">
+            <div class="section active" data-section="subscriptions">
                 <div class="section-header">
                     <h2 class="section-title">Подписки</h2>
                 </div>
-                <div class="novels-list">
-                    <!-- Контент будет добавлен через JavaScript -->
-                </div>
+                <div class="novels-list"></div>
                 <div class="empty-state">
                     <h3 class="empty-title">Нет подписок</h3>
                     <p>Найдите интересные новеллы и подпишитесь на их обновления</p>
                 </div>
-            </section>
+            </div>
 
             <!-- Секция закладок -->
-            <section class="section" data-section="bookmarks">
+            <div class="section" data-section="bookmarks">
                 <div class="section-header">
                     <h2 class="section-title">Закладки</h2>
                 </div>
-                <div class="novels-list">
-                    <!-- Контент будет добавлен через JavaScript -->
-                </div>
+                <div class="novels-list"></div>
                 <div class="empty-state">
                     <h3 class="empty-title">Нет закладок</h3>
                     <p>Добавляйте новеллы в закладки, чтобы не потерять их</p>
                 </div>
-            </section>
+            </div>
 
             <!-- Секция новых глав -->
-            <section class="section" data-section="latest">
+            <div class="section" data-section="latest">
                 <div class="section-header">
                     <h2 class="section-title">Новые главы</h2>
                     <div class="section-actions">
-                        <button class="filter-button" data-haptic="light">
-                            <span class="icon">📊</span>
-                            Фильтры
+                        <button class="action-button" data-haptic="light">
+                            <span class="icon">📊</span> Фильтры
                         </button>
-                        <button class="sort-button" data-haptic="light">
-                            <span class="icon">🔄</span>
-                            Сортировка
+                        <button class="action-button" data-haptic="light">
+                            <span class="icon">🔄</span> Сортировка
                         </button>
                     </div>
                 </div>
-                <div class="chapters-list">
-                    <!-- Контент будет добавлен через JavaScript -->
-                </div>
-            </section>
-        </main>
+                <div class="chapters-list"></div>
+            </div>
+        </div>
 
-        <!-- Состояния загрузки -->
+        <!-- Индикатор загрузки -->
         <div class="loading-indicator" style="display: none;">
             Загрузка...
         </div>
 
-        <!-- Шаблоны -->
+        <!-- Шаблон карточки новеллы -->
         <template id="novel-card-template">
             <div class="novel-card" data-haptic="light">
                 <div class="novel-info">
@@ -120,6 +115,7 @@
             </div>
         </template>
 
+        <!-- Шаблон карточки главы -->
         <template id="chapter-card-template">
             <div class="chapter-card" data-haptic="light">
                 <h3 class="chapter-title"></h3>
@@ -130,5 +126,7 @@
             </div>
         </template>
     </div>
+
+    <script type="module" src="/public/js/app.js"></script>
 </body>
 </html>
