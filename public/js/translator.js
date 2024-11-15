@@ -36,7 +36,9 @@ class TranslatorPage {
         try {
             // Инициализируем WebApp
             this.telegram.ready();
-            this.telegram.expand();
+            this.telegram.MainButton.hide();
+            this.telegram.BackButton.show();
+            this.telegram.BackButton.onClick(this.handleBackClick);
 
             // Проверяем права доступа
             const role = await storage.getUserRole();
@@ -57,12 +59,6 @@ class TranslatorPage {
     }
 
     initUI() {
-        // Кнопка "Назад"
-        const backBtn = document.querySelector('.back-button');
-        if (backBtn) {
-            backBtn.addEventListener('click', this.handleBackClick);
-        }
-
         // Табы
         document.querySelectorAll('.tab-button').forEach(tab => {
             tab.addEventListener('click', this.handleTabClick);
@@ -80,14 +76,25 @@ class TranslatorPage {
             this.state.isLoading = true;
             this.toggleLoading(true);
 
+            // Получаем id пользователя из Telegram
+            const userId = this.telegram.initDataUnsafe?.user?.id;
+            if (!userId) {
+                throw new Error('User ID not found');
+            }
+
             // Загружаем все данные параллельно
             const [novels, stats] = await Promise.all([
-                api.getNovelsByTranslator(this.telegram.initDataUnsafe?.user?.id),
-                api.getTranslatorStats(this.telegram.initDataUnsafe?.user?.id)
+                api.getNovels({ translatorId: userId.toString() }),
+                api.getTranslatorStats(userId)
             ]);
 
             this.state.novels = novels;
-            this.state.stats = stats;
+            this.state.stats = {
+                novelsCount: novels.length,
+                chaptersCount: novels.reduce((sum, novel) => sum + (novel.chapters_count || 0), 0),
+                subscribersCount: novels.reduce((sum, novel) => sum + (novel.subscribers_count || 0), 0),
+                views: novels.reduce((sum, novel) => sum + (novel.views || 0), 0)
+            };
 
             // Обновляем UI
             this.updateStats();
@@ -105,9 +112,11 @@ class TranslatorPage {
     updateStats() {
         // Обновляем статистику в шапке
         const statsElements = document.querySelectorAll('.translator-stats .stat-value');
-        statsElements[0].textContent = this.state.stats.novelsCount;
-        statsElements[1].textContent = this.state.stats.chaptersCount;
-        statsElements[2].textContent = this.state.stats.subscribersCount;
+        if (statsElements.length >= 3) {
+            statsElements[0].textContent = this.state.stats.novelsCount;
+            statsElements[1].textContent = this.state.stats.chaptersCount;
+            statsElements[2].textContent = this.state.stats.subscribersCount;
+        }
 
         // Обновляем карточки статистики
         const viewsElement = document.querySelector('.total-views .stat-value');
@@ -140,8 +149,8 @@ class TranslatorPage {
             const element = template.content.cloneNode(true);
             
             element.querySelector('.novel-title').textContent = novel.title;
-            element.querySelector('.chapters-count').textContent = `${novel.chapters_count} глав`;
-            element.querySelector('.subscribers-count').textContent = `${novel.subscribers_count} подписчиков`;
+            element.querySelector('.chapters-count').textContent = `${novel.chapters_count || 0} глав`;
+            element.querySelector('.subscribers-count').textContent = `${novel.subscribers_count || 0} подписчиков`;
 
             // Добавляем обработчики
             const card = element.querySelector('.novel-card');
@@ -150,6 +159,7 @@ class TranslatorPage {
             card.dataset.novelId = novel.id;
             card.addEventListener('click', (e) => {
                 if (e.target !== actionBtn) {
+                    this.telegram.HapticFeedback.impactOccurred('light');
                     window.location.href = `/novel.html?id=${novel.id}`;
                 }
             });
