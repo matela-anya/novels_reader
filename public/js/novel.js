@@ -1,3 +1,4 @@
+```javascript
 import api from './api.js';
 import storage from './storage.js';
 
@@ -13,6 +14,7 @@ class NovelPage {
         this.state = {
             novelId: null,
             novel: null,
+            mode: null,
             chapters: [],
             isSubscribed: false,
             isBookmarked: false,
@@ -30,6 +32,7 @@ class NovelPage {
         this.handleSortChange = this.handleSortChange.bind(this);
         this.handleChapterClick = this.handleChapterClick.bind(this);
         this.handleAddChapter = this.handleAddChapter.bind(this);
+        this.handleSave = this.handleSave.bind(this);
     }
 
     async init() {
@@ -38,26 +41,126 @@ class NovelPage {
             this.telegram.ready();
             this.telegram.expand();
 
-            // Получаем ID новеллы из URL
+            // Получаем параметры из URL
             const params = new URLSearchParams(window.location.search);
+            this.state.mode = params.get('mode');
             this.state.novelId = params.get('id');
 
-            if (!this.state.novelId) {
-                throw new Error('Novel ID is required');
+            // Настраиваем UI в зависимости от режима
+            if (this.state.mode === 'create' || this.state.mode === 'edit') {
+                await this.initEditMode();
+            } else {
+                await this.initViewMode();
             }
-
-            // Загружаем данные
-            await this.loadData();
-
-            // Инициализируем UI
-            this.initUI();
-
-            // Обновляем просмотры
-            await api.incrementNovelViews(this.state.novelId);
-
         } catch (error) {
             console.error('Initialization error:', error);
             this.showError('Не удалось загрузить новеллу');
+        }
+    }
+
+    async initEditMode() {
+        try {
+            // Скрываем режим просмотра, показываем режим редактирования
+            document.querySelector('.view-mode').style.display = 'none';
+            document.querySelector('.edit-mode').style.display = 'block';
+
+            // Показываем кнопку "Назад"
+            this.telegram.BackButton.show();
+            this.telegram.BackButton.onClick(() => window.history.back());
+
+            // Проверяем роль пользователя
+            const role = await storage.getUserRole();
+            if (role !== 'translator') {
+                throw new Error('Access denied');
+            }
+
+            // Настраиваем главную кнопку
+            this.telegram.MainButton.setText(this.state.mode === 'create' ? 'Создать' : 'Сохранить');
+            this.telegram.MainButton.show();
+            this.telegram.MainButton.onClick(this.handleSave);
+
+            if (this.state.mode === 'edit' && this.state.novelId) {
+                // Загружаем данные новеллы для редактирования
+                const novel = await api.getNovel(this.state.novelId);
+                if (novel.translator_id !== this.telegram.initDataUnsafe?.user?.id) {
+                    throw new Error('Access denied');
+                }
+                this.fillEditForm(novel);
+            }
+        } catch (error) {
+            console.error('Edit mode initialization error:', error);
+            this.showError(error.message);
+            window.history.back();
+        }
+    }
+
+    async initViewMode() {
+        // Показываем режим просмотра
+        document.querySelector('.view-mode').style.display = 'block';
+        document.querySelector('.edit-mode').style.display = 'none';
+
+        // Показываем кнопку "Назад"
+        this.telegram.BackButton.show();
+        this.telegram.BackButton.onClick(() => window.history.back());
+
+        if (!this.state.novelId) {
+            throw new Error('Novel ID is required for view mode');
+        }
+
+        // Загружаем данные
+        await this.loadData();
+        
+        // Инициализируем UI
+        this.initUI();
+
+        // Обновляем просмотры
+        await api.incrementNovelViews(this.state.novelId);
+    }
+
+    fillEditForm(novel) {
+        document.getElementById('title').value = novel.title || '';
+        document.getElementById('description').value = novel.description || '';
+        if (novel.cover_url) {
+            document.querySelector('.cover-image').src = novel.cover_url;
+        }
+    }
+
+    async handleSave() {
+        try {
+            this.telegram.MainButton.showProgress();
+            this.telegram.HapticFeedback.impactOccurred('medium');
+
+            const formData = {
+                title: document.getElementById('title').value.trim(),
+                description: document.getElementById('description').value.trim(),
+                cover_url: document.querySelector('.cover-image').src,
+                translator_id: this.telegram.initDataUnsafe?.user?.id
+            };
+
+            if (!formData.title) {
+                throw new Error('Название обязательно для заполнения');
+            }
+
+            if (!formData.translator_id) {
+                throw new Error('Не удалось определить переводчика');
+            }
+
+            let novel;
+            if (this.state.mode === 'create') {
+                novel = await api.createNovel(formData);
+                this.telegram.HapticFeedback.notificationOccurred('success');
+                window.location.href = `/novel.html?id=${novel.id}`;
+            } else {
+                await api.updateNovel(this.state.novelId, formData);
+                this.telegram.HapticFeedback.notificationOccurred('success');
+                window.location.href = `/novel.html?id=${this.state.novelId}`;
+            }
+        } catch (error) {
+            console.error('Save error:', error);
+            this.telegram.HapticFeedback.notificationOccurred('error');
+            this.showError(error.message || 'Не удалось сохранить новеллу');
+        } finally {
+            this.telegram.MainButton.hideProgress();
         }
     }
 
@@ -152,17 +255,11 @@ class NovelPage {
             loadMoreBtn.addEventListener('click', () => this.loadChapters());
         }
 
-        // Показываем панель переводчика если это владелец
-        if (this.state.isOwner && addChapterBtn) {
-            document.querySelector('.translator-panel').style.display = 'block';
+        // Показываем кнопку добавления главы если это владелец
+        if (addChapterBtn) {
+            addChapterBtn.style.display = this.state.isOwner ? 'flex' : 'none';
             addChapterBtn.addEventListener('click', this.handleAddChapter);
         }
-
-        // Добавляем кнопку "Назад"
-        this.telegram.BackButton.show();
-        this.telegram.BackButton.onClick(() => {
-            window.location.href = '/';
-        });
     }
 
     updateNovelInfo() {
@@ -173,36 +270,34 @@ class NovelPage {
         // Обложка
         const coverImg = document.querySelector('.novel-cover-image');
         if (coverImg) {
-            coverImg.src = this.state.novel.cover_url || '/static/images/placeholder.png';
+            coverImg.src = this.state.novel.cover_url || '/api/placeholder/400/600';
             coverImg.alt = this.state.novel.title;
         }
 
         // Статистика
-        document.querySelector('.stat.views').textContent = 
-            `${this.state.novel.views} просмотров`;
-        document.querySelector('.stat.subscribers').textContent = 
-            `${this.state.novel.subscribers} подписчиков`;
-        document.querySelector('.stat.chapters').textContent = 
-            `${this.state.chapters.length} глав`;
+        const views = document.querySelector('.stat.views .stat-value');
+        const subscribers = document.querySelector('.stat.subscribers .stat-value');
+        const chapters = document.querySelector('.stat.chapters .stat-value');
+
+        if (views) views.textContent = this.state.novel.views || 0;
+        if (subscribers) subscribers.textContent = this.state.novel.subscribers_count || 0;
+        if (chapters) chapters.textContent = this.state.novel.chapters_count || 0;
 
         // Информация о переводчике
-        document.querySelector('.translator-name').textContent = 
-            this.state.novel.translator_name;
-
-        const stats = document.querySelector('.translator-stats');
-        api.getTranslatorStats(this.state.novel.translator_id)
-            .then(translatorStats => {
-                stats.textContent = 
-                    `${translatorStats.novels_count} новелл, ${translatorStats.chapters_count} глав`;
-            });
+        const translatorName = document.querySelector('.translator-name');
+        if (translatorName) {
+            translatorName.textContent = this.state.novel.translator_name;
+        }
 
         // Описание и теги
-        document.querySelector('.description-text').textContent = 
-            this.state.novel.description;
+        const description = document.querySelector('.description-text');
+        if (description) {
+            description.textContent = this.state.novel.description;
+        }
 
         // Теги
         const tagsContainer = document.querySelector('.novel-tags');
-        if (this.state.novel.tags) {
+        if (tagsContainer && this.state.novel.tags) {
             tagsContainer.innerHTML = this.state.novel.tags
                 .map(tag => `<span class="tag">${tag}</span>`)
                 .join('');
@@ -214,6 +309,8 @@ class NovelPage {
         const emptyState = document.querySelector('.empty-state');
         const template = document.getElementById('chapter-card-template');
         const loadMoreBtn = document.querySelector('.load-more');
+
+        if (!container || !template) return;
 
         if (!this.state.chapters.length) {
             container.innerHTML = '';
@@ -315,8 +412,10 @@ class NovelPage {
             if (buttonId === 'cancel' || buttonId === this.state.chaptersSort) return;
             
             this.state.chaptersSort = buttonId;
-            document.querySelector('.sort-text').textContent = 
-                buttonId === 'desc' ? 'Сначала новые' : 'Сначала старые';
+            const sortLabel = document.querySelector('.sort-label');
+            if (sortLabel) {
+                sortLabel.textContent = buttonId === 'desc' ? 'Сначала новые' : 'Сначала старые';
+            }
             
             await this.loadChapters(true);
         });
@@ -339,7 +438,7 @@ class NovelPage {
             ]
         }, (buttonId) => {
             if (buttonId === 'add') {
-                window.location.href = `/chapter-edit.html?novelId=${this.state.novelId}`;
+                window.location.href = `/chapter.html?novelId=${this.state.novelId}&mode=create`;
             }
         });
     }
@@ -368,6 +467,11 @@ class NovelPage {
         if (loadMoreBtn) {
             loadMoreBtn.textContent = show ? 'Загрузка...' : 'Загрузить еще';
             loadMoreBtn.disabled = show;
+        }
+
+        const loader = document.querySelector('.loading-indicator');
+        if (loader) {
+            loader.style.display = show ? 'block' : 'none';
         }
     }
 
