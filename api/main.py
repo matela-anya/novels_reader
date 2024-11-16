@@ -3,6 +3,7 @@ Main API routes for Novels Reader
 """
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from typing import List, Optional, Dict, Any
 from datetime import datetime
 import json
@@ -51,6 +52,29 @@ async def get_db():
         app.state.pool = await asyncpg.create_pool(os.environ["DATABASE_URL"])
     return app.state.pool
 
+# Обработчик ошибок для красивых JSON-ответов
+@app.exception_handler(Exception)
+async def global_exception_handler(request, exc):
+    return JSONResponse(
+        status_code=500,
+        content={
+            "status": "error",
+            "message": str(exc),
+            "path": request.url.path
+        }
+    )
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request, exc):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "status": "error",
+            "message": exc.detail,
+            "path": request.url.path
+        }
+    )
+
 # Роуты для переводчиков
 @app.post("/api/translators")
 async def create_translator(data: TranslatorCreate):
@@ -62,7 +86,7 @@ async def create_translator(data: TranslatorCreate):
                 VALUES ($1, $2, $3, $4)
                 RETURNING *
             """, data.user_id, data.username, data.display_name, data.bio)
-            return {"status": "success", "data": dict(translator)}
+            return JSONResponse(content={"status": "success", "data": dict(translator)})
         except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))
 
@@ -76,7 +100,7 @@ async def get_translator(user_id: str):
         )
         if not translator:
             raise HTTPException(status_code=404, detail="Translator not found")
-        return {"status": "success", "data": dict(translator)}
+        return JSONResponse(content={"status": "success", "data": dict(translator)})
 
 @app.get("/api/translators/{user_id}/stats")
 async def get_translator_stats(user_id: str):
@@ -91,14 +115,15 @@ async def get_translator_stats(user_id: str):
             FROM novels 
             WHERE translator_id = $1
         """, user_id)
-        if not stats:
-            return {"status": "success", "data": {
+        return JSONResponse(content={
+            "status": "success", 
+            "data": dict(stats) if stats else {
                 "novels_count": 0,
                 "chapters_count": 0,
                 "subscribers_count": 0,
                 "total_views": 0
-            }}
-        return {"status": "success", "data": dict(stats)}
+            }
+        })
 
 # Роуты для новелл
 @app.get("/api/novels")
@@ -126,11 +151,11 @@ async def get_novels(
         if conditions:
             query += " WHERE " + " AND ".join(conditions)
 
-        query += " ORDER BY n.updated_at DESC LIMIT $" + str(len(params) + 1) + " OFFSET $" + str(len(params) + 2)
+        query += f" ORDER BY n.updated_at DESC LIMIT ${len(params) + 1} OFFSET ${len(params) + 2}"
         params.extend([limit, (page - 1) * limit])
 
         novels = await conn.fetch(query, *params)
-        return {"status": "success", "data": [dict(n) for n in novels]}
+        return JSONResponse(content={"status": "success", "data": [dict(n) for n in novels]})
 
 @app.post("/api/novels")
 async def create_novel(data: NovelCreate):
@@ -142,7 +167,7 @@ async def create_novel(data: NovelCreate):
                 VALUES ($1, $2, $3, $4)
                 RETURNING *
             """, data.title, data.description, data.cover_url, data.translator_id)
-            return {"status": "success", "data": dict(novel)}
+            return JSONResponse(content={"status": "success", "data": dict(novel)})
         except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))
 
@@ -164,7 +189,7 @@ async def get_novel(novel_id: int):
             "UPDATE novels SET views = views + 1 WHERE id = $1",
             novel_id
         )
-        return {"status": "success", "data": dict(novel)}
+        return JSONResponse(content={"status": "success", "data": dict(novel)})
 
 @app.delete("/api/novels/{novel_id}")
 async def delete_novel(novel_id: int):
@@ -176,7 +201,7 @@ async def delete_novel(novel_id: int):
         )
         if result == "DELETE 0":
             raise HTTPException(status_code=404, detail="Novel not found")
-        return {"status": "success"}
+        return JSONResponse(content={"status": "success"})
 
 # Роуты для глав
 @app.get("/api/chapters/latest")
@@ -197,7 +222,7 @@ async def get_latest_chapters(
             ORDER BY c.created_at DESC
             LIMIT $1 OFFSET $2
         """, limit, (page - 1) * limit)
-        return {"status": "success", "data": [dict(ch) for ch in chapters]}
+        return JSONResponse(content={"status": "success", "data": [dict(ch) for ch in chapters]})
 
 @app.post("/api/novels/{novel_id}/chapters")
 async def create_chapter(novel_id: int, data: ChapterCreate):
@@ -220,7 +245,7 @@ async def create_chapter(novel_id: int, data: ChapterCreate):
                     WHERE id = $1
                 """, novel_id)
 
-                return {"status": "success", "data": dict(chapter)}
+                return JSONResponse(content={"status": "success", "data": dict(chapter)})
         except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))
 
@@ -240,7 +265,7 @@ async def get_chapter(novel_id: int, chapter_id: int):
             "UPDATE chapters SET views = views + 1 WHERE id = $1",
             chapter_id
         )
-        return {"status": "success", "data": dict(chapter)}
+        return JSONResponse(content={"status": "success", "data": dict(chapter)})
 
 # Инициализация таблиц при старте
 @app.on_event("startup")
@@ -289,11 +314,16 @@ async def startup():
             )
         ''')
 
-# Обработчик ошибок для красивых JSON-ответов
-@app.exception_handler(Exception)
-async def global_exception_handler(request, exc):
-    return {
-        "status": "error",
-        "message": str(exc),
-        "path": request.url.path
-    }
+# Дефолтный роут
+@app.get("/")
+async def root():
+    return JSONResponse(content={
+        "status": "success",
+        "message": "Novels Reader API is running",
+        "version": "1.0.0"
+    })
+
+# Если API запущено напрямую
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
