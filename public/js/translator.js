@@ -1,3 +1,4 @@
+```javascript
 import api from './api.js';
 import storage from './storage.js';
 
@@ -211,7 +212,7 @@ class TranslatorPage {
             ]
         }, (buttonId) => {
             if (buttonId === 'add') {
-                window.location.href = '/novel-edit.html';
+                window.location.href = '/novel.html?mode=create';
             }
         });
     }
@@ -231,10 +232,10 @@ class TranslatorPage {
         }, async (buttonId) => {
             switch (buttonId) {
                 case 'add_chapter':
-                    window.location.href = `/chapter-edit.html?novelId=${novel.id}`;
+                    window.location.href = `/chapter.html?novelId=${novel.id}&mode=create`;
                     break;
                 case 'edit':
-                    window.location.href = `/novel-edit.html?id=${novel.id}`;
+                    window.location.href = `/novel.html?id=${novel.id}&mode=edit`;
                     break;
                 case 'delete':
                     await this.confirmNovelDeletion(novel);
@@ -310,3 +311,4 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 export default TranslatorPage;
+```
