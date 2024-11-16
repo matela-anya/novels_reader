@@ -1,5 +1,6 @@
+```html
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -8,115 +9,116 @@
     <meta name="MobileOptimized" content="176">
     <meta name="HandheldFriendly" content="True">
     <meta name="robots" content="noindex, nofollow">
-    <title>Чтение новеллы</title>
-
-    <!-- Telegram WebApp -->
+    <title>Novel Reader</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-    <!-- Стили -->
     <link rel="stylesheet" href="/static/css/styles.css">
-    <link rel="stylesheet" href="/static/css/novel.css">
-
-    <!-- Скрипты -->
-    <script type="module" src="/static/js/api.js"></script>
-    <script type="module" src="/static/js/storage.js"></script>
-    <script type="module" src="/static/js/novel.js"></script>
 </head>
 <body>
     <div class="app-container novel-page">
-        <!-- Шапка новеллы -->
-        <section class="novel-header">
-            <div class="novel-cover">
-                <img src="/api/placeholder/400/600" alt="Обложка новеллы" class="novel-cover-image">
+        <!-- Режим просмотра -->
+        <div class="view-mode" style="display: none">
+            <div class="section novel-header">
+                <div class="novel-cover">
+                    <img src="/api/placeholder/400/600" class="novel-cover-image" alt="Обложка новеллы">
+                </div>
+
+                <div class="novel-header-content">
+                    <h1 class="novel-title"></h1>
+
+                    <div class="novel-stats">
+                        <div class="stat views" data-icon="👁">
+                            <span class="stat-value">0</span> просмотров
+                        </div>
+
+                        <div class="stat subscribers" data-icon="👥">
+                            <span class="stat-value">0</span> подписчиков
+                        </div>
+
+                        <div class="stat chapters" data-icon="📖">
+                            <span class="stat-value">0</span> глав
+                        </div>
+                    </div>
+
+                    <div class="novel-actions">
+                        <button class="subscribe-button">Подписаться</button>
+                        <button class="bookmark-button" data-icon="🔖"></button>
+                    </div>
+                </div>
             </div>
 
-            <div class="novel-header-content">
-                <h1 class="novel-title"></h1>
+            <div class="novel-content">
+                <div class="section translator-info">
+                    <a href="#" class="translator-link" data-haptic="light">
+                        <div class="translator-avatar">
+                            <img src="/api/placeholder/48/48" alt="Аватар переводчика">
+                        </div>
 
-                <!-- Статистика -->
-                <div class="novel-stats">
-                    <div class="stat views" data-icon="👁">0 просмотров</div>
-                    <div class="stat subscribers" data-icon="👥">0 подписчиков</div>
-                    <div class="stat chapters" data-icon="📖">0 глав</div>
+                        <div class="translator-details">
+                            <div class="translator-name"></div>
+                            <div class="translator-stats"></div>
+                        </div>
+                    </a>
                 </div>
 
-                <!-- Действия -->
-                <div class="novel-actions">
-                    <button class="action-button primary subscribe-button" data-haptic="medium">
-                        Подписаться
-                    </button>
-                    <button class="action-button bookmark-button" data-haptic="light" aria-label="Добавить в закладки">
-                        <span class="icon">🔖</span>
-                    </button>
+                <div class="section novel-description">
+                    <h2 class="section-title">О новелле</h2>
+                    <div class="description-text"></div>
+                    <div class="novel-tags"></div>
+                </div>
+
+                <div class="section chapters-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Главы</h2>
+                        <div class="section-actions">
+                            <button class="sort-button" data-icon="🔄">
+                                <span class="sort-label">По номеру</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="chapters-list"></div>
+
+                    <button class="load-more">Загрузить еще</button>
+
+                    <div class="empty-state" style="display: none">
+                        <h3 class="empty-title">Нет глав</h3>
+                        <p>Главы этой новеллы пока не опубликованы</p>
+                    </div>
                 </div>
             </div>
-        </section>
 
-        <!-- Основной контент -->
-        <div class="novel-content">
-            <!-- Информация о переводчике -->
-            <section class="translator-info">
-                <a href="#" class="translator-link" data-haptic="light">
-                    <div class="translator-avatar">
-                        <img src="/api/placeholder/48/48" alt="Аватар переводчика">
-                    </div>
-                    <div class="translator-details">
-                        <div class="translator-name"></div>
-                        <div class="translator-stats"></div>
-                    </div>
-                </a>
-            </section>
-
-            <!-- Описание новеллы -->
-            <section class="novel-description">
-                <h2 class="section-title">О новелле</h2>
-                <div class="description-text"></div>
-                <div class="novel-tags"></div>
-            </section>
-
-            <!-- Список глав -->
-            <section class="chapters-section">
-                <div class="section-header">
-                    <h2 class="section-title">Главы</h2>
-                    <div class="section-actions">
-                        <button class="sort-button" data-haptic="light">
-                            <span class="icon">🔄</span>
-                            <span class="sort-label">По номеру</span>
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="chapters-list">
-                    <!-- Главы будут добавлены через JavaScript -->
-                </div>
-
-                <button class="load-more" data-haptic="light" style="display: none;">
-                    Загрузить еще
-                </button>
-
-                <!-- Пустое состояние -->
-                <div class="empty-state" style="display: none;">
-                    <h3 class="empty-title">Нет глав</h3>
-                    <p>Главы этой новеллы пока не опубликованы</p>
-                </div>
-            </section>
+            <button class="add-chapter-button" data-icon="📝">Добавить главу</button>
         </div>
 
-        <!-- Панель для переводчика -->
-        <footer class="translator-panel" style="display: none;">
-            <button class="button button-primary add-chapter-button" data-haptic="medium">
-                <span class="icon">📝</span>
-                Добавить главу
-            </button>
-        </footer>
+        <!-- Режим создания/редактирования -->
+        <div class="edit-mode" style="display: none">
+            <div class="section novel-form">
+                <div class="form-group">
+                    <label for="title">Название новеллы</label>
+                    <input type="text" id="title" name="title" class="form-input" placeholder="Введите название" required>
+                </div>
 
-        <!-- Состояние загрузки -->
-        <div class="loading-indicator" style="display: none;">
+                <div class="form-group">
+                    <label for="description">Описание</label>
+                    <textarea id="description" name="description" class="form-input" placeholder="Введите описание новеллы" rows="5"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="cover">Обложка</label>
+                    <div class="cover-preview">
+                        <img src="/api/placeholder/400/600" alt="Обложка" class="cover-image">
+                        <button class="change-cover-button" data-icon="📷">Изменить обложку</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="loading-indicator" style="display: none">
             Загрузка...
         </div>
     </div>
 
-    <!-- Шаблоны -->
+    <!-- Шаблон карточки главы -->
     <template id="chapter-card-template">
         <div class="chapter-card" data-haptic="light">
             <h3 class="chapter-title"></h3>
@@ -126,5 +128,7 @@
             </div>
         </div>
     </template>
+
+    <script type="module" src="/static/js/novel.js"></script>
 </body>
 </html>
